@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>DownTube</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] } } }
+		}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50/70 to-white">
+    <header class="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2 font-semibold text-slate-800">
+                <svg class="w-6 h-6 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.22v7.56c0 1.96-2.12 3.19-3.82 2.11l-5.2-3.35a2.49 2.49 0 0 1 0-4.06l5.2-3.35C19.88 5.04 22 6.27 22 8.22z"/><path d="M2 8v8"/><path d="M6 4v16"/></svg>
+                <span>DownTube</span>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-5xl mx-auto px-5 py-8">
+        <section class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6">
+            <h1 class="text-2xl font-semibold text-slate-900">YouTube Downloader</h1>
+            <p class="text-slate-600 mt-1">Download videos and playlists as MP4 or MP3.</p>
+            <div class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">YouTube URL</label>
+                    <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=... or playlist URL" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-slate-300" />
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Format</label>
+                        <div class="inline-grid grid-flow-col rounded-xl border border-slate-200 overflow-hidden text-sm">
+                            <input type="radio" id="fmt-mp4" name="format" value="mp4" class="hidden" checked>
+                            <label for="fmt-mp4" class="px-3.5 py-2.5 cursor-pointer hover:bg-slate-50">MP4 (Video)</label>
+                            <input type="radio" id="fmt-mp3" name="format" value="mp3" class="hidden">
+                            <label for="fmt-mp3" class="px-3.5 py-2.5 cursor-pointer hover:bg-slate-50">MP3 (Audio)</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Destination</label>
+                        <div class="grid grid-cols-[1fr_auto] gap-2">
+                            <input id="output" type="text" readonly class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-white" />
+                            <button id="choose" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50">Choose…</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-2">
+                    <button id="download" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 shadow-md">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download
+                    </button>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="flex items-center justify-between text-sm text-slate-600 mb-2">
+                    <span id="progress-title">Ready</span>
+                    <span id="progress-count"></span>
+                </div>
+                <div class="h-3 bg-slate-100 rounded-full overflow-hidden ring-1 ring-slate-200">
+                    <div id="bar-inner" class="h-full bg-gradient-to-r from-sky-600 to-rose-600 w-0 transition-all duration-200"></div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-slate-700 mt-3">
+                    <div><span class="text-slate-500">Size:</span> <span id="progress-size">—</span></div>
+                    <div><span class="text-slate-500">Speed:</span> <span id="progress-speed">—</span></div>
+                    <div><span class="text-slate-500">ETA:</span> <span id="progress-eta">—</span></div>
+                    <div><span class="text-slate-500">Percent:</span> <span id="progress-percent">0%</span></div>
+                </div>
+                <ol id="log" class="mt-4 pl-5 list-disc max-h-56 overflow-auto text-slate-600"></ol>
+            </div>
+        </section>
+
+        <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur border border-slate-200 rounded-xl shadow-md px-2 py-1 flex items-center gap-4">
+            <button data-tab="home" class="px-3 py-1.5 text-sm font-semibold border-b-2 border-transparent">Home</button>
+            <button data-tab="downloads" class="px-3 py-1.5 text-sm font-semibold border-b-2 border-transparent">Downloads</button>
+            <button data-tab="settings" class="px-3 py-1.5 text-sm font-semibold border-b-2 border-transparent">Settings</button>
+        </nav>
+
+        <section class="mt-6 space-y-6">
+            <div data-panel="home">
+                <!-- Home already above -->
+            </div>
+            <div data-panel="downloads" class="hidden">
+                <div class="bg-white border border-slate-200 rounded-xl p-4">
+                    <h2 class="font-semibold mb-2">In Progress</h2>
+                    <ul id="downloads-list" class="list-disc pl-5 text-slate-700"></ul>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl p-4 mt-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-semibold mb-2">Recent Downloads</h2>
+                        <button id="clear-history" class="text-sm px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-50">Clear</button>
+                    </div>
+                    <ul id="history-list" class="list-disc pl-5 text-slate-700"></ul>
+                </div>
+            </div>
+            <div data-panel="settings" class="hidden">
+                <div class="bg-white border border-slate-200 rounded-xl p-4">
+                    <h2 class="font-semibold mb-2">Settings</h2>
+                    <p class="text-slate-600 text-sm">Default folder, format presets, and more can be added here.</p>
+                    <h3 class="font-semibold mt-4">About</h3>
+                    <p class="text-slate-600 text-sm">DownTube — A modern YouTube Video and Playlist downloader for Windows, built with Electron.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+	<script src="./renderer.js"></script>
+</body>
+</html>
+
+

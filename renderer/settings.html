@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>DownTube • Settings</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] } } } }
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="./applySettings.js"></script>
+    <link rel="stylesheet" href="./theme.css" />
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50/70 to-white">
+	<header class="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-slate-200">
+		<div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+			<div class="flex items-center gap-2 font-semibold text-slate-800">
+				<svg class="w-6 h-6 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.22v7.56c0 1.96-2.12 3.19-3.82 2.11l-5.2-3.35a2.49 2.49 0 0 1 0-4.06l5.2-3.35C19.88 5.04 22 6.27 22 8.22z"/><path d="M2 8v8"/><path d="M6 4v16"/></svg>
+				<span>DownTube</span>
+			</div>
+			<div class="flex items-center gap-1 -mr-1">
+			<button id="app-min" class="btn-win btn-win--min rounded-md p-1.5" title="Minimize">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M5 12.75h14v1.5H5z"/></svg>
+			</button>
+			<button id="app-max" class="btn-win btn-win--max rounded-md p-1.5" title="Maximize/Restore">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M6.75 5A1.75 1.75 0 005 6.75v10.5C5 18.216 5.784 19 6.75 19h10.5A1.75 1.75 0 0019 17.25V6.75A1.75 1.75 0 0017.25 5H6.75zm0 1.5h10.5a.25.25 0 01.25.25v10.5a.25.25 0 01-.25.25H6.75a.25.25 0 01-.25-.25V6.75a.25.25 0 01.25-.25z"/></svg>
+			</button>
+			<button id="app-close" class="btn-win btn-win--close rounded-md p-1.5" title="Close">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+					<path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+				</svg>
+			</button>
+			</div>
+		</div>
+	</header>
+
+	<main class="max-w-5xl mx-auto px-5 py-8">
+        <section class="space-y-6">
+
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
+                <h2 class="text-lg font-semibold mb-4">Personalize Setting</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Theme</label>
+                        <select id="theme" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="sunset">Sunset</option>
+                            <option value="desert">Desert</option>
+                            <option value="ocean">Ocean</option>
+                            <option value="lavender">Lavender</option>
+                            <option value="solarized">Solarized</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Font</label>
+                        <select id="font" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm">
+                            <option value="Poppins">Poppins</option>
+                            <option value="Ubuntu">Ubuntu</option>
+                            <option value="Geist Mono">Geist Mono</option>
+                            <option value="Inter">Inter</option>
+                            <option value="System">System Default</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Default Download Folder</label>
+                        <div class="grid grid-cols-[1fr_auto] gap-2">
+                            <input id="default-dir" type="text" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-white" />
+                            <button id="choose-default" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50">Choose…</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Max Concurrent Downloads</label>
+                        <select id="max-concurrent" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm">
+                            <option value="1">1 (Sequential)</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                        <div class="text-xs text-slate-500 mt-1">
+                            Controls how many playlist items download simultaneously. 
+                            <br>• <strong>1:</strong> Downloads one at a time (slower but more stable)
+                            <br>• <strong>3-5:</strong> Downloads multiple items simultaneously (faster but uses more bandwidth)
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button id="save-settings" class="px-4 py-2.5 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700">Save</button>
+                    <span id="saved-note" class="text-slate-500 text-sm hidden">Saved ✓</span>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
+                <h2 class="text-lg font-semibold mb-4">Updates</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-slate-600">Current Version</div>
+                            <div id="current-version" class="font-semibold text-slate-800">Loading...</div>
+                        </div>
+                        <button id="check-updates" class="px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Check for Updates
+                        </button>
+                    </div>
+                    <div id="update-status" class="hidden">
+                        <div id="update-message" class="text-sm text-slate-600"></div>
+                        <div id="update-actions" class="mt-2 space-y-2"></div>
+                    </div>
+                    <div id="last-check" class="text-xs text-slate-500 hidden">
+                        Last checked: <span id="last-check-time"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
+                <h2 class="text-lg font-semibold mb-4">About DownTube</h2>
+                <div id="about" class="text-slate-600 text-sm space-y-1 mb-4"></div>
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4 text-sm text-slate-600">
+                        <div><span class="text-slate-500">Website:</span> <a href="https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs" target="_blank" class="underline">Project GitHub</a></div>
+                        <div><span class="text-slate-500">Support:</span> <a href="mailto:alikhanjalbani@outlook.com" class="underline">alikhanjalbani@outlook.com</a></div>
+                        <div><span class="text-slate-500">License:</span> MIT</div>
+                        <div><span class="text-slate-500">Credits:</span> yt-dlp, ffmpeg</div>
+                    </div>
+                    
+                    <div class="border-t border-slate-200 pt-4">
+                        <h3 class="font-semibold text-slate-800 mb-2">Features Overview</h3>
+                        <div class="grid md:grid-cols-2 gap-3 text-xs text-slate-600">
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <span>Professional error handling & recovery</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <span>Auto-update system with GitHub integration</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <span>Playlist range selection & batch downloading</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <span>Multiple format support (MP4, MP3)</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <span>Quality selection & customization</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <span>Theme & font customization</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-200 pt-4">
+                        <h3 class="font-semibold text-slate-800 mb-2">Technical Details</h3>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <div><span class="text-slate-500">Framework:</span> Electron.js with Node.js backend</div>
+                            <div><span class="text-slate-500">Download Engine:</span> yt-dlp (YouTube-DL successor)</div>
+                            <div><span class="text-slate-500">Media Processing:</span> FFmpeg for format conversion</div>
+                            <div><span class="text-slate-500">UI Framework:</span> Tailwind CSS with vanilla JavaScript</div>
+                            <div><span class="text-slate-500">Error Handling:</span> Custom error categorization & logging</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
+                <h2 class="text-lg font-semibold mb-4">How to Use DownTube</h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="font-semibold text-slate-800 mb-3">📥 Basic Download Process</h3>
+                        <ol class="list-decimal pl-5 text-slate-600 text-sm space-y-2">
+                            <li><strong>Paste URL:</strong> Enter a YouTube video or playlist URL in the input field</li>
+                            <li><strong>Fetch Info:</strong> Click "Fetch" to analyze the content and get available formats</li>
+                            <li><strong>Select Format:</strong> Choose between MP4 (video) or MP3 (audio only)</li>
+                            <li><strong>Choose Quality:</strong> Select your preferred video quality or audio bitrate</li>
+                            <li><strong>Download:</strong> Click "Download" to start the process</li>
+                        </ol>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-slate-800 mb-3">🎵 Playlist Downloads</h3>
+                        <div class="text-slate-600 text-sm space-y-2">
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-500 mt-0.5">•</span>
+                                <span><strong>Range Selection:</strong> Use the range slider to specify start and end positions</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-500 mt-0.5">•</span>
+                                <span><strong>Concurrent Downloads:</strong> Control how many items download simultaneously (1-5)</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-500 mt-0.5">•</span>
+                                <span><strong>Batch Processing:</strong> Downloads complete in batches, then start the next batch</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-slate-800 mb-3">⚙️ Settings & Customization</h3>
+                        <div class="text-slate-600 text-sm space-y-2">
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">•</span>
+                                <span><strong>Output Directory:</strong> Set your preferred download folder</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">•</span>
+                                <span><strong>Theme Selection:</strong> Choose from multiple color schemes</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">•</span>
+                                <span><strong>Font Options:</strong> Customize application fonts</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-green-500 mt-0.5">•</span>
+                                <span><strong>Concurrent Downloads:</strong> Adjust playlist download speed (1-5)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-slate-800 mb-3">📊 Monitoring & Management</h3>
+                        <div class="text-slate-600 text-sm space-y-2">
+                            <div class="flex items-start gap-2">
+                                <span class="text-purple-500 mt-0.5">•</span>
+                                <span><strong>Downloads Page:</strong> Track progress, speed, and ETA for all downloads</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-purple-500 mt-0.5">•</span>
+                                <span><strong>Download History:</strong> View completed downloads and access files</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-purple-500 mt-0.5">•</span>
+                                <span><strong>Cancel Downloads:</strong> Stop any download at any time</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <h3 class="font-semibold text-blue-800 mb-2">💡 Pro Tips</h3>
+                        <div class="text-blue-700 text-sm space-y-1">
+                            <div>• Use range selection for large playlists to download specific sections</div>
+                            <div>• Set concurrent downloads to 1 for slower but more stable connections</div>
+                            <div>• MP3 format is perfect for music playlists and audio content</div>
+                            <div>• Check the Downloads page for real-time progress and speed information</div>
+                            <div>• Use the Settings page to customize your download experience</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-2xl px-2 py-1 flex items-center gap-2 bottom-nav">
+            <a href="./home.html" class="px-4 py-2 text-sm font-semibold rounded-xl">Home</a>
+            <a href="./downloads.html" class="px-4 py-2 text-sm font-semibold rounded-xl">Downloads</a>
+            <a href="./settings.html" class="px-4 py-2 text-sm font-semibold rounded-xl active">Settings</a>
+        </nav>
+    </main>
+    <script src="./settings.js"></script>
+</body>
+</html>
+
+

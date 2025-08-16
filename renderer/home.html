@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>DownTube • Home</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] } } } }
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./theme.css" />
+    <script src="./applySettings.js"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50/70 to-white">
+    <header class="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2 font-semibold text-slate-800">
+				<svg class="w-6 h-6 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.22v7.56c0 1.96-2.12 3.19-3.82 2.11l-5.2-3.35a2.49 2.49 0 0 1 0-4.06l5.2-3.35C19.88 5.04 22 6.27 22 8.22z"/><path d="M2 8v8"/><path d="M6 4v16"/></svg>
+				<span>DownTube</span>
+				<div id="update-indicator" class="hidden">
+					<button id="update-notification" class="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors" title="New version available! Click to view details">
+						🆕 Update Available
+					</button>
+				</div>
+			</div>
+            <div class="flex items-center gap-1 -mr-1">
+            <button id="app-min" class="btn-win btn-win--min rounded-md p-1.5" title="Minimize">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M5 12.75h14v1.5H5z"/></svg>
+            </button>
+            <button id="app-max" class="btn-win btn-win--max rounded-md p-1.5" title="Maximize/Restore">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M6.75 5A1.75 1.75 0 005 6.75v10.5C5 18.216 5.784 19 6.75 19h10.5A1.75 1.75 0 0019 17.25V6.75A1.75 1.75 0 0017.25 5H6.75zm0 1.5h10.5a.25.25 0 01.25.25v10.5a.25.25 0 01-.25.25H6.75a.25.25 0 01-.25-.25V6.75a.25.25 0 01.25-.25z"/></svg>
+            </button>
+            <button id="app-close" class="btn-win btn-win--close rounded-md p-1.5" title="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            </div>
+		</div>
+	</header>
+
+	<main class="max-w-5xl mx-auto px-5 py-8">
+		<section class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
+			<h1 class="text-2xl font-semibold text-slate-900">YouTube Downloader</h1>
+			<p class="text-slate-600 mt-1">Download videos and playlists as MP4 or MP3.</p>
+			<div class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-2">YouTube URL</label>
+                    <div class="grid grid-cols-[1fr_auto] gap-2">
+                        <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=... or playlist URL" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-slate-300" />
+                        <button id="fetch" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50">Fetch</button>
+                    </div>
+                    <div id="fetch-result" class="text-xs text-slate-600 mt-2 text-center"></div>
+                    <div id="playlist-range" class="hidden mt-3">
+                        <div class="flex items-center justify-between text-xs text-slate-600 mb-1">
+                            <span>Range</span>
+                            <span><span id="range-label-start">1</span> – <span id="range-label-end">1</span></span>
+                        </div>
+                        <div class="range-container">
+                            <div class="h-1.5 rounded-full range-track"></div>
+                            <div id="range-fill" class="absolute top-1/2 -translate-y-1/2 h-1.5 rounded-full" style="left:0; right:0;"></div>
+                            <input id="range-start" class="range-thumb absolute inset-0 w-full z-20" type="range" min="1" max="1" value="1">
+                            <input id="range-end" class="range-thumb absolute inset-0 w-full z-10" type="range" min="1" max="1" value="1">
+                        </div>
+                        <div id="concurrent-info" class="text-xs text-slate-500 mt-2 text-center">
+                            Downloads will be processed in batches of <span id="concurrent-count">3</span> items simultaneously
+                        </div>
+                    </div>
+                </div>
+				<div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Format</label>
+                        <div class="inline-grid grid-flow-col rounded-xl border border-slate-200 overflow-hidden text-sm">
+                            <input type="radio" id="fmt-mp4" name="format" value="mp4" class="hidden" checked>
+                            <label for="fmt-mp4" class="px-3.5 py-2.5 cursor-pointer hover:bg-slate-50 format-pill">MP4 (Video)</label>
+                            <input type="radio" id="fmt-mp3" name="format" value="mp3" class="hidden">
+                            <label for="fmt-mp3" class="px-3.5 py-2.5 cursor-pointer hover:bg-slate-50 format-pill">MP3 (Audio)</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Quality</label>
+                        <select id="quality" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-white"></select>
+                        <div id="quality-hint" class="text-xs text-slate-500 mt-1"></div>
+                    </div>
+				</div>
+				<div class="pt-2">
+                    <button id="download" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 shadow-md disabled-btn">
+						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+						Download
+					</button>
+				</div>
+			</div>
+			<!-- Progress removed from Home; available in Downloads page -->
+		</section>
+
+        <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-2xl px-2 py-1 flex items-center gap-2 bottom-nav">
+            <a href="./home.html" class="px-4 py-2 text-sm font-semibold rounded-xl active">Home</a>
+            <a href="./downloads.html" class="px-4 py-2 text-sm font-semibold rounded-xl">Downloads</a>
+            <a href="./settings.html" class="px-4 py-2 text-sm font-semibold rounded-xl">Settings</a>
+        </nav>
+	</main>
+
+	<script src="./home.js"></script>
+</body>
+</html>
+
+

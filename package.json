@@ -1,0 +1,57 @@
+{
+  "name": "DownTube",
+  "version": "1.0.0",
+  "description": "A Youtube Videos and Playlist Downloader Application",
+  "main": "index.js",
+  "author": "Ali Khan Jalbani",
+  "license": "ISC",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.ali.downtube",
+    "productName": "DownTube",
+    "copyright": "Copyright © 2025 Ali Khan",
+    "compression": "maximum",
+    "win": {
+      "target": "nsis",
+      "icon": "renderer/icon.ico"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!*.map",
+      "!yt-dlp.exe",
+      "!ffmpeg.exe"
+    ],
+    "extraResources": [
+      {
+        "from": "yt-dlp.exe",
+        "to": "yt-dlp.exe"
+      },
+      {
+        "from": "ffmpeg.exe",
+        "to": "ffmpeg.exe"
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "sanitize-filename": "^1.6.3"
+  }
+}
