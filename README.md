@@ -13,7 +13,6 @@
 
 [🚀 **Download Latest Release**](https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs/releases) • [📖 **Documentation**](#-features) • [🐛 **Report Issues**](https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs/issues)
 
-![DownTube Preview](https://via.placeholder.com/800x400/1e40af/ffffff?text=DownTube+Application+Preview)
 
 </div>
 
@@ -65,8 +64,8 @@
 
 | **Architecture** | **Download Link** | **File Size** |
 |:---:|:---|:---:|
-| **64-bit** | [📦 DownTube-64bit.exe](https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs/releases) | ~103 MB |
-| **32-bit** | [📦 DownTube-32bit.exe](https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs/releases) | ~97 MB |
+| **64-bit** | [📦 DownTube-64bit.exe](https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs/releases) | ~80 MB |
+| **32-bit** | [📦 DownTube-32bit.exe](https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs/releases) | ~70 MB |
 
 </div>
 
