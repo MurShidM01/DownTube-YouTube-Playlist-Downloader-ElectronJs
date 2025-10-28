@@ -1,6 +1,6 @@
 {
   "name": "DownTube",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Youtube Videos and Playlist Downloader Application",
   "main": "index.js",
   "author": "Ali Khan Jalbani",
@@ -16,7 +16,15 @@
     "copyright": "Copyright © 2025 Ali Khan",
     "compression": "maximum",
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
       "icon": "renderer/icon.ico"
     },
     "directories": {
@@ -28,23 +36,22 @@
       "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
       "!*.map",
       "!yt-dlp.exe",
-      "!ffmpeg.exe"
-    ],
-    "extraResources": [
-      {
-        "from": "yt-dlp.exe",
-        "to": "yt-dlp.exe"
-      },
-      {
-        "from": "ffmpeg.exe",
-        "to": "ffmpeg.exe"
-      }
+      "!ffmpeg.exe",
+      "!dist/**/*"
     ],
     "nsis": {
       "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
       "allowToChangeInstallationDirectory": true,
+      "installerIcon": "renderer/icon.ico",
+      "uninstallerIcon": "renderer/icon.ico",
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "shortcutName": "DownTube",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": true,
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
     }
   },
   "devDependencies": {

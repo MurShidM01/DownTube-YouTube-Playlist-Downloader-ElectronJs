@@ -22,8 +22,11 @@
 				<svg class="w-6 h-6 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.22v7.56c0 1.96-2.12 3.19-3.82 2.11l-5.2-3.35a2.49 2.49 0 0 1 0-4.06l5.2-3.35C19.88 5.04 22 6.27 22 8.22z"/><path d="M2 8v8"/><path d="M6 4v16"/></svg>
 				<span>DownTube</span>
 				<div id="update-indicator" class="hidden">
-					<button id="update-notification" class="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors" title="New version available! Click to view details">
-						🆕 Update Available
+					<button id="update-notification" class="ml-2 px-2.5 py-1.5 text-xs bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-lg hover:from-green-100 hover:to-emerald-100 transition-all border border-green-200 font-medium flex items-center gap-1.5" title="New version available! Click to view details">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+						</svg>
+						Update Available
 					</button>
 				</div>
 			</div>
@@ -44,15 +47,36 @@
 	</header>
 
 	<main class="max-w-5xl mx-auto px-5 py-8">
-		<section class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
-			<h1 class="text-2xl font-semibold text-slate-900">YouTube Downloader</h1>
-			<p class="text-slate-600 mt-1">Download videos and playlists as MP4 or MP3.</p>
+		<section class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-8 theme-card">
+			<div class="flex items-start gap-4 mb-6">
+				<div class="p-3 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl shadow-lg shadow-rose-200">
+					<svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+						<polyline points="7 10 12 15 17 10"></polyline>
+						<line x1="12" y1="15" x2="12" y2="3"></line>
+					</svg>
+				</div>
+				<div class="flex-1">
+					<h1 class="text-2xl font-bold text-slate-900">YouTube Downloader</h1>
+					<p class="text-slate-600 mt-1">Download videos and playlists in high quality MP4 or MP3 format.</p>
+				</div>
+			</div>
 			<div class="mt-5 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-2">YouTube URL</label>
-                    <div class="grid grid-cols-[1fr_auto] gap-2">
-                        <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=... or playlist URL" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-slate-300" />
-                        <button id="fetch" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50">Fetch</button>
+                    <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        YouTube URL
+                    </label>
+                    <div class="grid grid-cols-[1fr_auto] gap-3">
+                        <input id="url" type="text" placeholder="https://www.youtube.com/watch?v=... or playlist URL" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all" />
+                        <button id="fetch" class="px-5 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Fetch
+                        </button>
                     </div>
                     <div id="fetch-result" class="text-xs text-slate-600 mt-2 text-center"></div>
                     <div id="playlist-range" class="hidden mt-3">
@@ -71,27 +95,54 @@
                         </div>
                     </div>
                 </div>
-				<div class="grid md:grid-cols-2 gap-4">
+				<div class="grid md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Format</label>
-                        <div class="inline-grid grid-flow-col rounded-xl border border-slate-200 overflow-hidden text-sm">
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                            </svg>
+                            Format
+                        </label>
+                        <div class="inline-grid grid-flow-col rounded-xl border-2 border-slate-200 overflow-hidden text-sm bg-slate-50">
                             <input type="radio" id="fmt-mp4" name="format" value="mp4" class="hidden" checked>
-                            <label for="fmt-mp4" class="px-3.5 py-2.5 cursor-pointer hover:bg-slate-50 format-pill">MP4 (Video)</label>
+                            <label for="fmt-mp4" class="px-4 py-3 cursor-pointer hover:bg-white transition-all format-pill font-medium flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6.47L5.76 10H20v8H4V6.47M22 4h-4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4z"/></svg>
+                                MP4
+                            </label>
                             <input type="radio" id="fmt-mp3" name="format" value="mp3" class="hidden">
-                            <label for="fmt-mp3" class="px-3.5 py-2.5 cursor-pointer hover:bg-slate-50 format-pill">MP3 (Audio)</label>
+                            <label for="fmt-mp3" class="px-4 py-3 cursor-pointer hover:bg-white transition-all format-pill font-medium flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                                MP3
+                            </label>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Quality</label>
-                        <select id="quality" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-white"></select>
-                        <div id="quality-hint" class="text-xs text-slate-500 mt-1"></div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Quality
+                        </label>
+                        <select id="quality" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-400 transition-all font-medium cursor-pointer"></select>
+                        <div id="quality-hint" class="text-xs text-slate-500 mt-2 flex items-start gap-1.5">
+                            <svg class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span></span>
+                        </div>
                     </div>
 				</div>
-				<div class="pt-2">
-                    <button id="download" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 shadow-md disabled-btn">
-						<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-						Download
+				<div class="pt-4 flex flex-col items-center gap-3">
+                    <button id="download" class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white font-bold hover:from-sky-700 hover:to-blue-700 shadow-lg shadow-sky-200 disabled-btn transition-all transform hover:scale-105 active:scale-95">
+						<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+						Start Download
 					</button>
+					<div class="text-xs text-slate-500 flex items-center gap-1.5">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+						<span>Ready to download</span>
+					</div>
 				</div>
 			</div>
 			<!-- Progress removed from Home; available in Downloads page -->

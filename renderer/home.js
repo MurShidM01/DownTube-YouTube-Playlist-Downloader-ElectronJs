@@ -18,17 +18,6 @@ let lastProbeRes = null;
 let updateInfo = null;
 let currentMaxConcurrent = 3;
 
-function setBar(percent) {
-	const v = Math.max(0, Math.min(100, Number(percent) || 0));
-	barInner.style.width = `${v}%`;
-}
-
-function addLog(text) {
-	const li = document.createElement('li');
-	li.textContent = text;
-	logEl.prepend(li);
-}
-
 async function init() {
     setupQuality();
     setDownloadEnabled(false);
@@ -63,6 +52,45 @@ function updateConcurrentDisplay() {
     }
 }
 
+// Helper functions for quality management
+const addQualityOption = (label, selected=false) => {
+    if (!qualitySel) return;
+    const opt = document.createElement('option');
+    opt.value = label;
+    opt.textContent = label;
+    if (selected) opt.selected = true;
+    qualitySel.appendChild(opt);
+};
+
+const getProbe = async (url) => {
+    if (lastProbeUrl === url && lastProbeRes) return lastProbeRes;
+    const res = await window.downTube.probeFormats(url);
+    lastProbeUrl = url;
+    lastProbeRes = res;
+    return res;
+};
+
+const populateQuality = (fmt, res) => {
+    if (!qualitySel) return;
+    qualitySel.innerHTML = '';
+    addQualityOption('Auto', true);
+    if (fmt === 'mp4') {
+        const heights = Array.isArray(res?.videoHeights) && res.videoHeights.length ? [...res.videoHeights].sort((a,b)=>b-a) : [2160,1440,1080,720,480,360,240,144];
+        heights.forEach(h => addQualityOption(`${h}p`));
+        if (qualityHint) {
+            const hintSpan = qualityHint.querySelector('span');
+            if (hintSpan) hintSpan.textContent = 'Available video qualities detected for this content.';
+        }
+    } else {
+        const list = Array.isArray(res?.audioKbps) && res.audioKbps.length ? [...res.audioKbps].sort((a,b)=>b-a) : [320,256,192,160,128,96];
+        list.forEach(k => addQualityOption(`${k} kbps`));
+        if (qualityHint) {
+            const hintSpan = qualityHint.querySelector('span');
+            if (hintSpan) hintSpan.textContent = 'Available audio bitrates detected for this content.';
+        }
+    }
+};
+
 function setupQuality(){
     if (!qualitySel) return;
     const applyDefault = () => {
@@ -70,50 +98,45 @@ function setupQuality(){
         qualitySel.innerHTML = '';
         if (fmt === 'mp4') {
             ['Auto','2160p','1440p','1080p','720p','480p','360p','240p','144p'].forEach(q => addQualityOption(q, q === 'Auto'));
-            if (qualityHint) qualityHint.textContent = 'Auto selects the best available MP4 quality.';
+            if (qualityHint) {
+                const hintSpan = qualityHint.querySelector('span');
+                if (hintSpan) hintSpan.textContent = 'Auto selects the best available MP4 quality for this video.';
+            }
         } else {
             ['Auto','320 kbps','256 kbps','192 kbps','160 kbps','128 kbps','96 kbps'].forEach(q => addQualityOption(q, q === 'Auto'));
-            if (qualityHint) qualityHint.textContent = 'Auto selects a good quality audio bitrate.';
+            if (qualityHint) {
+                const hintSpan = qualityHint.querySelector('span');
+                if (hintSpan) hintSpan.textContent = 'Auto selects the best available audio bitrate for this content.';
+            }
         }
-    };
-    const addQualityOption = (label, selected=false) => {
-        const opt = document.createElement('option');
-        opt.value = label;
-        opt.textContent = label;
-        if (selected) opt.selected = true;
-        qualitySel.appendChild(opt);
-    };
-    const populateQuality = (fmt, res) => {
-        qualitySel.innerHTML = '';
-        addQualityOption('Auto', true);
-        if (fmt === 'mp4') {
-            const heights = Array.isArray(res?.videoHeights) && res.videoHeights.length ? [...res.videoHeights].sort((a,b)=>b-a) : [2160,1440,1080,720,480,360,240,144];
-            heights.forEach(h => addQualityOption(`${h}p`));
-            if (qualityHint) qualityHint.textContent = 'Detected qualities for this video.';
-        } else {
-            const list = Array.isArray(res?.audioKbps) && res.audioKbps.length ? [...res.audioKbps].sort((a,b)=>b-a) : [320,256,192,160,128,96];
-            list.forEach(k => addQualityOption(`${k} kbps`));
-            if (qualityHint) qualityHint.textContent = 'Detected audio bitrates.';
-        }
-    };
-
-    const getProbe = async (url) => {
-        if (lastProbeUrl === url && lastProbeRes) return lastProbeRes;
-        const res = await window.downTube.probeFormats(url);
-        lastProbeUrl = url;
-        lastProbeRes = res;
-        return res;
     };
 
     const repopulateFromProbe = async () => {
         const url = urlInput.value.trim();
         if (!/^https?:\/\//i.test(url)) { applyDefault(); return; }
         const currentFmt = document.querySelector('input[name="format"]:checked')?.value || 'mp4';
+        
+        // Check if download was previously enabled
+        const wasDownloadEnabled = downloadBtn && !downloadBtn.classList.contains('disabled-btn');
+        
+        // Disable quality and download button while loading
+        if (qualitySel) qualitySel.disabled = true;
+        if (downloadBtn) downloadBtn.classList.add('disabled-btn');
+        
         await new Promise(r => setTimeout(r, 0));
         try {
             const res = await getProbe(url);
             populateQuality(currentFmt, res?.ok ? res : null);
-        } catch { applyDefault(); }
+        } catch { 
+            applyDefault(); 
+        } finally {
+            // Re-enable quality dropdown
+            if (qualitySel) qualitySel.disabled = false;
+            // Re-enable download button if it was previously enabled
+            if (wasDownloadEnabled && downloadBtn) {
+                downloadBtn.classList.remove('disabled-btn');
+            }
+        }
     };
     // events
     urlInput.addEventListener('change', repopulateFromProbe);
@@ -156,9 +179,19 @@ downloadBtn.addEventListener('click', async () => {
 if (fetchBtn) fetchBtn.addEventListener('click', async () => {
     const url = urlInput.value.trim();
     if (!url) { alert('Enter a URL first.'); return; }
+    
+    // Store original button content
+    const originalHTML = fetchBtn.innerHTML;
+    
     try {
         fetchBtn.disabled = true;
-        fetchBtn.textContent = 'Fetching…';
+        // Add loading spinner
+        fetchBtn.innerHTML = `
+            <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Fetching...</span>
+        `;
         const info = await window.downTube.fetchInfo(url);
         if (info?.ok) {
             if (info.type === 'playlist') {
@@ -200,10 +233,19 @@ if (fetchBtn) fetchBtn.addEventListener('click', async () => {
             })();
             const fmt = document.querySelector('input[name="format"]:checked')?.value || 'mp4';
             populateQuality(fmt, res?.ok ? res : null);
-        } catch {}
+        } catch (error) {
+            console.error('Error during fetch:', error);
+        }
+    } catch (error) {
+        console.error('Fetch error:', error);
+        fetchResult.textContent = 'Failed to fetch video information';
+        if (rangeWrap) rangeWrap.classList.add('hidden');
+        if (concurrentInfo) concurrentInfo.classList.add('hidden');
+        setDownloadEnabled(false);
     } finally {
         fetchBtn.disabled = false;
-        fetchBtn.textContent = 'Fetch';
+        // Restore original button content
+        fetchBtn.innerHTML = originalHTML;
     }
 });
 
@@ -289,27 +331,8 @@ if (maxBtn) maxBtn.addEventListener('click', () => { try { window.downTube.windo
 // Update notification functionality
 async function checkForUpdatesOnStartup() {
     try {
-        // Check if we have stored update info
-        const preferences = await window.downTube.getUpdatePreferences();
-        if (preferences.ok && preferences.preferences.lastCheck) {
-            const lastCheck = preferences.preferences.lastCheck;
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            
-            // Only check if it's been more than a day since last check
-            if (now - lastCheck > oneDay) {
-                await checkForUpdates();
-            }
-        }
-    } catch (error) {
-        console.error('Error checking for updates on startup:', error);
-    }
-}
-
-async function checkForUpdates() {
-    try {
         const result = await window.downTube.checkForUpdates();
-        if (result.ok && result.hasUpdate) {
+        if (result?.ok && result?.hasUpdate && result?.updateInfo) {
             updateInfo = result.updateInfo;
             showUpdateNotification();
         }

@@ -41,12 +41,27 @@
 	<main class="max-w-5xl mx-auto px-5 py-8">
         <section class="space-y-6">
 
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
-                <h2 class="text-lg font-semibold mb-4">Personalize Setting</h2>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-8 theme-card">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg shadow-purple-200">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Personalization</h2>
+                        <p class="text-sm text-slate-600">Customize appearance and behavior</p>
+                    </div>
+                </div>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Theme</label>
-                        <select id="theme" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm">
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                            </svg>
+                            Theme
+                        </label>
+                        <select id="theme" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all font-medium cursor-pointer">
                             <option value="light">Light</option>
                             <option value="dark">Dark</option>
                             <option value="sunset">Sunset</option>
@@ -57,8 +72,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Font</label>
-                        <select id="font" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm">
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Font Family
+                        </label>
+                        <select id="font" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all font-medium cursor-pointer">
                             <option value="Poppins">Poppins</option>
                             <option value="Ubuntu">Ubuntu</option>
                             <option value="Geist Mono">Geist Mono</option>
@@ -67,59 +87,116 @@
                         </select>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Default Download Folder</label>
-                        <div class="grid grid-cols-[1fr_auto] gap-2">
-                            <input id="default-dir" type="text" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-white" />
-                            <button id="choose-default" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold hover:bg-slate-50">Choose…</button>
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                            </svg>
+                            Default Download Folder
+                        </label>
+                        <div class="grid grid-cols-[1fr_auto] gap-3">
+                            <input id="default-dir" type="text" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all" />
+                            <button id="choose-default" class="px-5 py-3 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Browse
+                            </button>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Max Concurrent Downloads</label>
-                        <select id="max-concurrent" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm">
+                        <label class="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Concurrent Downloads
+                        </label>
+                        <select id="max-concurrent" class="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all font-medium cursor-pointer">
                             <option value="1">1 (Sequential)</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
                             <option value="5">5</option>
                         </select>
-                        <div class="text-xs text-slate-500 mt-1">
-                            Controls how many playlist items download simultaneously. 
-                            <br>• <strong>1:</strong> Downloads one at a time (slower but more stable)
-                            <br>• <strong>3-5:</strong> Downloads multiple items simultaneously (faster but uses more bandwidth)
+                        <div class="text-xs text-slate-500 mt-2 flex items-start gap-1.5">
+                            <svg class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>Controls how many playlist items download simultaneously. Set to 1 for sequential downloads or 3-5 for parallel processing.</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-3 mt-6">
-                    <button id="save-settings" class="px-4 py-2.5 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700">Save</button>
-                    <span id="saved-note" class="text-slate-500 text-sm hidden">Saved ✓</span>
+                <div class="flex gap-3 mt-8">
+                    <button id="save-settings" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-200 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Save Settings
+                    </button>
+                    <span id="saved-note" class="hidden text-green-600 text-sm font-semibold flex items-center gap-2 px-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Saved successfully!
+                    </span>
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
-                <h2 class="text-lg font-semibold mb-4">Updates</h2>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-8 theme-card">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg shadow-green-200">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Software Updates</h2>
+                        <p class="text-sm text-slate-600">Check for the latest version</p>
+                    </div>
+                </div>
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-white border-2 border-slate-200 rounded-xl">
                         <div>
-                            <div class="text-sm text-slate-600">Current Version</div>
-                            <div id="current-version" class="font-semibold text-slate-800">Loading...</div>
+                            <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Current Version
+                            </div>
+                            <div id="current-version" class="font-bold text-lg text-slate-800">Loading...</div>
                         </div>
-                        <button id="check-updates" class="px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Check for Updates
+                        <button id="check-updates" class="px-5 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Check Updates
                         </button>
                     </div>
                     <div id="update-status" class="hidden">
                         <div id="update-message" class="text-sm text-slate-600"></div>
                         <div id="update-actions" class="mt-2 space-y-2"></div>
                     </div>
-                    <div id="last-check" class="text-xs text-slate-500 hidden">
+                    <div id="last-check" class="text-xs text-slate-500 hidden flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                         Last checked: <span id="last-check-time"></span>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
-                <h2 class="text-lg font-semibold mb-4">About DownTube</h2>
-                <div id="about" class="text-slate-600 text-sm space-y-1 mb-4"></div>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-8 theme-card">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-200">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">About DownTube</h2>
+                        <p class="text-sm text-slate-600">Application information</p>
+                    </div>
+                </div>
+                <div id="about" class="text-slate-600 text-sm space-y-1 mb-6 p-4 bg-gradient-to-r from-slate-50 to-white border-2 border-slate-200 rounded-xl"></div>
                 <div class="space-y-4">
                     <div class="grid md:grid-cols-2 gap-4 text-sm text-slate-600">
                         <div><span class="text-slate-500">Website:</span> <a href="https://github.com/MurShidM01/DownTube-YouTube-Playlist-Downloader-ElectronJs" target="_blank" class="underline">Project GitHub</a></div>
@@ -128,31 +205,48 @@
                         <div><span class="text-slate-500">Credits:</span> yt-dlp, ffmpeg</div>
                     </div>
                     
-                    <div class="border-t border-slate-200 pt-4">
-                        <h3 class="font-semibold text-slate-800 mb-2">Features Overview</h3>
-                        <div class="grid md:grid-cols-2 gap-3 text-xs text-slate-600">
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">✓</span>
+                    <div class="border-t-2 border-slate-200 pt-5">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                            </svg>
+                            Features Overview
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-3 text-sm text-slate-600">
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 <span>Professional error handling & recovery</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">✓</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 <span>Auto-update system with GitHub integration</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">✓</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 <span>Playlist range selection & batch downloading</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">✓</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 <span>Multiple format support (MP4, MP3)</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">✓</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 <span>Quality selection & customization</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">✓</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 <span>Theme & font customization</span>
                             </div>
                         </div>
@@ -171,12 +265,27 @@
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
-                <h2 class="text-lg font-semibold mb-4">How to Use DownTube</h2>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-8 theme-card">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2.5 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg shadow-amber-200">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">User Guide</h2>
+                        <p class="text-sm text-slate-600">Learn how to use DownTube</p>
+                    </div>
+                </div>
                 
                 <div class="space-y-6">
-                    <div>
-                        <h3 class="font-semibold text-slate-800 mb-3">📥 Basic Download Process</h3>
+                    <div class="p-5 bg-gradient-to-r from-blue-50 to-sky-50 border-2 border-blue-200 rounded-xl">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Basic Download Process
+                        </h3>
                         <ol class="list-decimal pl-5 text-slate-600 text-sm space-y-2">
                             <li><strong>Paste URL:</strong> Enter a YouTube video or playlist URL in the input field</li>
                             <li><strong>Fetch Info:</strong> Click "Fetch" to analyze the content and get available formats</li>
@@ -186,72 +295,112 @@
                         </ol>
                     </div>
 
-                    <div>
-                        <h3 class="font-semibold text-slate-800 mb-3">🎵 Playlist Downloads</h3>
+                    <div class="p-5 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                            </svg>
+                            Playlist Downloads
+                        </h3>
                         <div class="text-slate-600 text-sm space-y-2">
-                            <div class="flex items-start gap-2">
-                                <span class="text-blue-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Range Selection:</strong> Use the range slider to specify start and end positions</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-blue-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Concurrent Downloads:</strong> Control how many items download simultaneously (1-5)</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-blue-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Batch Processing:</strong> Downloads complete in batches, then start the next batch</span>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="font-semibold text-slate-800 mb-3">⚙️ Settings & Customization</h3>
+                    <div class="p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Settings & Customization
+                        </h3>
                         <div class="text-slate-600 text-sm space-y-2">
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Output Directory:</strong> Set your preferred download folder</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Theme Selection:</strong> Choose from multiple color schemes</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Font Options:</strong> Customize application fonts</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-green-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Concurrent Downloads:</strong> Adjust playlist download speed (1-5)</span>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="font-semibold text-slate-800 mb-3">📊 Monitoring & Management</h3>
+                    <div class="p-5 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 rounded-xl">
+                        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Monitoring & Management
+                        </h3>
                         <div class="text-slate-600 text-sm space-y-2">
-                            <div class="flex items-start gap-2">
-                                <span class="text-purple-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Downloads Page:</strong> Track progress, speed, and ETA for all downloads</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-purple-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Download History:</strong> View completed downloads and access files</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="text-purple-500 mt-0.5">•</span>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg>
                                 <span><strong>Cancel Downloads:</strong> Stop any download at any time</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                        <h3 class="font-semibold text-blue-800 mb-2">💡 Pro Tips</h3>
-                        <div class="text-blue-700 text-sm space-y-1">
-                            <div>• Use range selection for large playlists to download specific sections</div>
-                            <div>• Set concurrent downloads to 1 for slower but more stable connections</div>
-                            <div>• MP3 format is perfect for music playlists and audio content</div>
-                            <div>• Check the Downloads page for real-time progress and speed information</div>
-                            <div>• Use the Settings page to customize your download experience</div>
+                    <div class="p-5 bg-gradient-to-r from-indigo-50 via-blue-50 to-cyan-50 border-2 border-indigo-300 rounded-xl">
+                        <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                            Pro Tips
+                        </h3>
+                        <div class="text-indigo-900 text-sm space-y-2">
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <span>Use range selection for large playlists to download specific sections</span>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <span>Set concurrent downloads to 1 for slower but more stable connections</span>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <span>MP3 format is perfect for music playlists and audio content</span>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <svg class="w-4 h-4 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <span>Check the Downloads page for real-time progress and speed information</span>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,8 @@ contextBridge.exposeInMainWorld('downTube', {
 	getActiveDownloads: () => ipcRenderer.invoke('get-active-downloads'),
 	getHistory: () => ipcRenderer.invoke('get-history'),
 	clearHistory: () => ipcRenderer.invoke('clear-history'),
+	showItemInFolder: (path) => ipcRenderer.invoke('show-item-in-folder', path),
+	openPath: (path) => ipcRenderer.invoke('open-path', path),
 	getSettings: () => ipcRenderer.invoke('get-settings'),
 	saveSettings: (s) => ipcRenderer.invoke('save-settings', s),
 	getAppInfo: () => ipcRenderer.invoke('get-app-info'),
@@ -20,6 +22,18 @@ contextBridge.exposeInMainWorld('downTube', {
 	checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 	showUpdateDialog: (updateInfo) => ipcRenderer.invoke('show-update-dialog', updateInfo),
 	getUpdatePreferences: () => ipcRenderer.invoke('get-update-preferences'),
+	// Dependency management functions
+	checkDependencies: () => ipcRenderer.invoke('check-dependencies'),
+	downloadDependencies: () => ipcRenderer.invoke('download-dependencies'),
+	getDependencyPaths: () => ipcRenderer.invoke('get-dependency-paths'),
+	onDependencyProgress: (listener) => {
+		ipcRenderer.removeAllListeners('dependency-download-progress');
+		ipcRenderer.on('dependency-download-progress', (_e, payload) => listener(payload));
+	},
+	onDependencyComplete: (listener) => {
+		ipcRenderer.removeAllListeners('dependency-download-complete');
+		ipcRenderer.on('dependency-download-complete', (_e, payload) => listener(payload));
+	},
 	onProgress: (listener) => {
 		ipcRenderer.removeAllListeners('download-progress');
 		ipcRenderer.on('download-progress', (_e, payload) => listener(payload));

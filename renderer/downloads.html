@@ -22,8 +22,11 @@
 				<svg class="w-6 h-6 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.22v7.56c0 1.96-2.12 3.19-3.82 2.11l-5.2-3.35a2.49 2.49 0 0 1 0-4.06l5.2-3.35C19.88 5.04 22 6.27 22 8.22z"/><path d="M2 8v8"/><path d="M6 4v16"/></svg>
 				<span>DownTube</span>
 				<div id="update-indicator" class="hidden">
-					<button id="update-notification" class="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors" title="New version available! Click to view details">
-						🆕 Update Available
+					<button id="update-notification" class="ml-2 px-2.5 py-1.5 text-xs bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-lg hover:from-green-100 hover:to-emerald-100 transition-all border border-green-200 font-medium flex items-center gap-1.5" title="New version available! Click to view details">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+						</svg>
+						Update Available
 					</button>
 				</div>
 			</div>
@@ -44,23 +47,55 @@
 	</header>
 
 	<main class="max-w-5xl mx-auto px-5 py-8">
-		<section class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-6 theme-card">
-			<h1 class="text-2xl font-semibold text-slate-900">Downloads</h1>
-			<div class="bg-white border border-slate-200 rounded-xl p-4 mt-4">
-				<h2 class="font-semibold mb-2">In Progress</h2>
-				<ul id="downloads-list" class="list-disc pl-5 text-slate-700"></ul>
-			</div>
-			<div class="bg-white border border-slate-200 rounded-xl p-4 mt-4">
-				<div class="flex items-center justify-between">
-					<h2 class="font-semibold mb-2">Recent Downloads</h2>
-					<button id="clear-history" class="text-sm px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-50">Clear</button>
+		<section class="bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(2_6_23_/_0.06)] p-8 theme-card">
+			<div class="flex items-start gap-4 mb-6">
+				<div class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-200">
+					<svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+					</svg>
 				</div>
-				<ul id="history-list" class="list-disc pl-5 text-slate-700"></ul>
+				<div class="flex-1">
+					<h1 class="text-2xl font-bold text-slate-900">Downloads Manager</h1>
+					<p class="text-slate-600 mt-1">Track your active downloads and view download history</p>
+				</div>
 			</div>
-			<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mt-4">
-				<div class="text-xs text-slate-600">
-					<strong>Current Settings:</strong> Maximum concurrent downloads: <span id="current-concurrent-setting">3</span>
-					<span id="concurrent-description"> (Downloads will be processed in batches of 3 items simultaneously)</span>
+			<div class="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-xl p-5 mt-6 shadow-inner">
+				<h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+					<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+					</svg>
+					Active Downloads
+				</h2>
+				<ul id="downloads-list" class="space-y-3 text-slate-700"></ul>
+			</div>
+			<div class="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-xl p-5 mt-6 shadow-inner theme-card">
+				<div class="flex items-center justify-between mb-4">
+					<h2 class="font-bold text-slate-800 flex items-center gap-2">
+						<svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+						Recent Downloads
+					</h2>
+					<button id="clear-history" class="text-sm px-3 py-2 rounded-lg bg-white border-2 border-slate-200 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-all font-semibold flex items-center gap-2 shadow-sm">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+						</svg>
+						Clear History
+					</button>
+				</div>
+				<div id="history-list" class="space-y-2"></div>
+			</div>
+			<div class="bg-gradient-to-r from-blue-50 via-sky-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-4 mt-6">
+				<div class="flex items-start gap-3">
+					<svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+					</svg>
+					<div class="text-sm text-blue-900">
+						<p class="font-bold mb-1">Download Settings</p>
+						<p class="text-blue-700">Maximum concurrent downloads: <span class="font-bold text-blue-900" id="current-concurrent-setting">3</span></p>
+						<p class="text-xs text-blue-600 mt-1" id="concurrent-description">Downloads will be processed in batches of 3 items simultaneously</p>
+					</div>
 				</div>
 			</div>
 		</section>

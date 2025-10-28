@@ -6,6 +6,7 @@ const sanitizeFilename = require('sanitize-filename');
 const { spawn } = require('child_process');
 const https = require('https');
 const { URL } = require('url');
+const DependencyManager = require('./dependencyManager');
 
 // Error handling utilities
 class ErrorHandler {
@@ -80,24 +81,75 @@ class ErrorHandler {
 
     static async checkInternetConnection() {
         try {
-            const { spawn } = require('child_process');
+            const https = require('https');
             return new Promise((resolve) => {
-                const ping = process.platform === 'win32' ? 'ping' : 'ping';
-                const args = process.platform === 'win32' ? ['-n', '1', '8.8.8.8'] : ['-c', '1', '8.8.8.8'];
-                const proc = spawn(ping, args, { stdio: 'ignore' });
+                // Try multiple endpoints for better reliability
+                const endpoints = [
+                    { hostname: 'www.google.com', path: '/' },
+                    { hostname: 'www.youtube.com', path: '/' },
+                    { hostname: '8.8.8.8', path: '/' }
+                ];
                 
-                proc.on('close', (code) => {
-                    resolve(code === 0);
-                });
+                let resolved = false;
+                let attempts = 0;
                 
-                proc.on('error', () => {
-                    resolve(false);
-                });
-
-                // Timeout after 5 seconds
+                const tryEndpoint = (endpoint) => {
+                    if (resolved) return;
+                    
+                    const options = {
+                        hostname: endpoint.hostname,
+                        port: 443,
+                        path: endpoint.path,
+                        method: 'HEAD',
+                        timeout: 3000,
+                        rejectUnauthorized: false // Allow self-signed certs
+                    };
+                    
+                    const req = https.request(options, (res) => {
+                        if (!resolved) {
+                            resolved = true;
+                            resolve(true);
+                        }
+                    });
+                    
+                    req.on('error', () => {
+                        attempts++;
+                        if (attempts >= endpoints.length && !resolved) {
+                            resolved = true;
+                            resolve(false);
+                        }
+                    });
+                    
+                    req.on('timeout', () => {
+                        req.destroy();
+                        attempts++;
+                        if (attempts >= endpoints.length && !resolved) {
+                            resolved = true;
+                            resolve(false);
+                        }
+                    });
+                    
+                    req.end();
+                };
+                
+                // Try first endpoint
+                tryEndpoint(endpoints[0]);
+                
+                // If first fails, try others after a short delay
                 setTimeout(() => {
-                    try { proc.kill(); } catch {}
-                    resolve(false);
+                    if (!resolved) tryEndpoint(endpoints[1]);
+                }, 1000);
+                
+                setTimeout(() => {
+                    if (!resolved) tryEndpoint(endpoints[2]);
+                }, 2000);
+                
+                // Overall timeout
+                setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve(false);
+                    }
                 }, 5000);
             });
         } catch {
@@ -441,6 +493,9 @@ const historyFile = () => path.join(app.getPath('userData'), 'history.json');
 let appSettings = { theme: 'light', font: 'Poppins', showCompleteDialog: true, openFolderOnComplete: false };
 const settingsFile = () => path.join(app.getPath('userData'), 'settings.json');
 
+// Initialize dependency manager
+let dependencyManager;
+
 async function loadHistory() {
 	try {
 		const file = historyFile();
@@ -543,37 +598,152 @@ function createMainWindow(show = false) {
 	});
 }
 
+// Check internet connectivity
+async function checkInternetConnection() {
+	return new Promise((resolve) => {
+		const https = require('https');
+		const options = {
+			hostname: 'www.google.com',
+			port: 443,
+			path: '/',
+			method: 'HEAD',
+			timeout: 5000
+		};
+		
+		const req = https.request(options, (res) => {
+			resolve(true);
+		});
+		
+		req.on('error', () => {
+			resolve(false);
+		});
+		
+		req.on('timeout', () => {
+			req.destroy();
+			resolve(false);
+		});
+		
+		req.end();
+	});
+}
+
 function createSplash() {
 	splashWindow = new BrowserWindow({
-		width: 480,
-		height: 300,
+		width: 550,
+		height: 500,
 		frame: false,
 		transparent: true,
 		resizable: false,
 		alwaysOnTop: true,
 		backgroundColor: '#00000000',
-		webPreferences: { contextIsolation: true, sandbox: true }
+		webPreferences: { 
+			contextIsolation: false,
+			nodeIntegration: true
+		}
 	});
 	splashWindow.loadFile(path.join(__dirname, 'renderer', 'splash.html'));
+	
+	// Send font setting to splash screen once it's loaded
+	splashWindow.webContents.once('did-finish-load', () => {
+		if (appSettings && appSettings.font) {
+			splashWindow.webContents.send('apply-font', appSettings.font);
+		}
+	});
+}
+
+// Function to initialize dependencies
+async function initializeDependencies() {
+	let depStatus = { allAvailable: true };
+	try {
+		console.log('[Startup] Checking dependencies...');
+		
+		// Send status to splash screen
+		if (splashWindow && !splashWindow.isDestroyed()) {
+			splashWindow.webContents.send('splash-status', 'Checking dependencies...');
+		}
+		
+		depStatus = dependencyManager.checkDependencies();
+		
+		if (!depStatus.allAvailable) {
+			console.log('[Startup] Some dependencies are missing, checking internet...');
+			
+			// Check internet connection before downloading
+			const hasInternet = await checkInternetConnection();
+			
+			if (!hasInternet) {
+				console.log('[Startup] No internet connection detected');
+				if (splashWindow && !splashWindow.isDestroyed()) {
+					splashWindow.webContents.send('no-internet');
+				}
+				return depStatus;
+			}
+			
+			console.log('[Startup] Internet connected, downloading dependencies...');
+			
+			// Show progress via splash or main window
+			const progressCallback = (progress) => {
+				broadcast('dependency-download-progress', progress);
+			};
+			
+			await dependencyManager.downloadMissingDependencies(progressCallback);
+			console.log('[Startup] All dependencies downloaded successfully');
+			broadcast('dependency-download-complete', { success: true });
+			
+			// Give time for the user to see the completion message
+			await new Promise(resolve => setTimeout(resolve, 1000));
+		} else {
+			console.log('[Startup] All dependencies are available');
+			
+			// Send status to splash screen
+			if (splashWindow && !splashWindow.isDestroyed()) {
+				splashWindow.webContents.send('splash-status', 'Loading application...');
+			}
+		}
+		
+		// Test executable finding
+		const ytdlpPath = findExecutable(process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
+		const ffmpegPath = findExecutable(process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg');
+		console.log('[Startup] yt-dlp path:', ytdlpPath);
+		console.log('[Startup] ffmpeg path:', ffmpegPath);
+		
+		if (!ytdlpPath || !ffmpegPath) {
+			console.error('[Startup] ERROR: Failed to locate required dependencies!');
+			// Don't show error dialog if we already showed no internet modal
+			if (depStatus.allAvailable) {
+				dialog.showErrorBox(
+					'Missing Dependencies',
+					'Failed to download required dependencies (yt-dlp and ffmpeg). Please check your internet connection and try again.'
+				);
+			}
+		}
+	} catch (error) {
+		console.error('[Startup] Error setting up dependencies:', error);
+		dialog.showErrorBox(
+			'Dependency Error',
+			`Failed to setup required dependencies: ${error.message}\n\nPlease check your internet connection and try again.`
+		);
+	}
+	
+	return depStatus;
 }
 
 app.whenReady().then(async () => {
 	await loadHistory();
 	await loadSettings();
 	
+	// Initialize dependency manager
+	dependencyManager = new DependencyManager();
+	
 	// Debug: Log executable locations at startup
 	console.log('[Startup] Current working directory:', process.cwd());
 	console.log('[Startup] App resources path:', process.resourcesPath);
 	console.log('[Startup] App path:', app.getAppPath());
 	
-	// Test executable finding
-	const ytdlpPath = findExecutable(process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
-	const ffmpegPath = findExecutable(process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg');
-	console.log('[Startup] yt-dlp path:', ytdlpPath);
-	console.log('[Startup] ffmpeg path:', ffmpegPath);
-	
 	createSplash();
 	createMainWindow(false);
+	
+	// Initialize dependencies
+	const depStatus = await initializeDependencies();
 	
 	// Check for updates after a delay to not interfere with startup
 	setTimeout(async () => {
@@ -591,10 +761,13 @@ app.whenReady().then(async () => {
 		}
 	}, 5000);
 
+	// Close splash and show main window
+	// Use longer delay to show completion message if dependencies were downloaded
+	const splashDelay = !depStatus.allAvailable ? 2500 : 1800;
 	setTimeout(() => {
 		try { splashWindow?.close(); } catch {}
 		mainWindow?.show();
-	}, 2200);
+	}, splashDelay);
 
 	app.on('activate', () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
@@ -624,6 +797,27 @@ ipcMain.handle('clear-history', async () => {
 	downloadsHistory = [];
 	saveHistory();
 	return { ok: true };
+});
+
+ipcMain.handle('show-item-in-folder', async (event, filePath) => {
+	try {
+		const { shell } = require('electron');
+		shell.showItemInFolder(filePath);
+		return { ok: true };
+	} catch (error) {
+		console.error('Error showing item in folder:', error);
+		return { ok: false, error: error.message };
+	}
+});
+
+ipcMain.handle('open-path', async (event, folderPath) => {
+	try {
+		await shell.openPath(folderPath);
+		return { ok: true };
+	} catch (error) {
+		console.error('Error opening path:', error);
+		return { ok: false, error: error.message };
+	}
 });
 
 ipcMain.handle('get-settings', async () => {
@@ -708,6 +902,74 @@ ipcMain.handle('choose-output-dir', async () => {
 	return filePaths[0];
 });
 
+// Dependency management handlers
+ipcMain.handle('check-dependencies', async () => {
+	try {
+		if (!dependencyManager) {
+			return { ok: false, message: 'Dependency manager not initialized' };
+		}
+		const status = dependencyManager.checkDependencies();
+		return { ok: true, ...status };
+	} catch (error) {
+		await ErrorHandler.handleError(error, 'check-dependencies');
+		return { ok: false, message: ErrorHandler.getErrorMessage(error) };
+	}
+});
+
+ipcMain.handle('download-dependencies', async () => {
+	try {
+		if (!dependencyManager) {
+			return { ok: false, message: 'Dependency manager not initialized' };
+		}
+		
+		const progressCallback = (progress) => {
+			broadcast('dependency-download-progress', progress);
+		};
+		
+		const result = await dependencyManager.downloadMissingDependencies(progressCallback);
+		broadcast('dependency-download-complete', { success: true });
+		return { ok: true, ...result };
+	} catch (error) {
+		await ErrorHandler.handleError(error, 'download-dependencies');
+		broadcast('dependency-download-complete', { success: false, error: error.message });
+		return { ok: false, message: ErrorHandler.getErrorMessage(error) };
+	}
+});
+
+ipcMain.handle('get-dependency-paths', async () => {
+	try {
+		if (!dependencyManager) {
+			return { ok: false, message: 'Dependency manager not initialized' };
+		}
+		return { 
+			ok: true, 
+			ytdlpPath: dependencyManager.getYtDlpPath(),
+			ffmpegPath: dependencyManager.getFfmpegPath()
+		};
+	} catch (error) {
+		await ErrorHandler.handleError(error, 'get-dependency-paths');
+		return { ok: false, message: ErrorHandler.getErrorMessage(error) };
+	}
+});
+
+// Handle retry connection from splash screen
+ipcMain.on('retry-connection', async () => {
+	console.log('[Startup] Retrying connection...');
+	
+	// Re-initialize dependencies
+	const depStatus = await initializeDependencies();
+	
+	// If still no internet, the modal will show again
+	// If successful, continue with normal startup
+	if (depStatus.allAvailable || (depStatus.ytdlp && depStatus.ffmpeg)) {
+		// Close splash and show main window
+		setTimeout(() => {
+			try { splashWindow?.close(); } catch {}
+			mainWindow?.show();
+		}, 2000);
+	}
+});
+
 ipcMain.handle('window-close', async (event) => {
     try {
         const win = BrowserWindow.fromWebContents(event.sender);
@@ -745,15 +1007,8 @@ ipcMain.handle('probe-formats', async (_event, url) => {
         // Validate URL
         await ErrorHandler.validateUrl(url);
         
-        // Check internet connectivity
-        if (!await ErrorHandler.checkInternetConnection()) {
-            throw ErrorHandler.createError(
-                ErrorHandler.errorTypes.NETWORK,
-                'No internet connection. Please check your network and try again.',
-                { url },
-                true
-            );
-        }
+        // Note: Removed strict internet check - let yt-dlp handle network errors naturally
+        // This prevents false negatives and reduces latency
 
         return await RetryManager.withRetry(async () => {
             return await probeFormats(url);
@@ -774,15 +1029,8 @@ ipcMain.handle('fetch-info', async (_event, url) => {
         // Validate URL
         await ErrorHandler.validateUrl(url);
         
-        // Check internet connectivity
-        if (!await ErrorHandler.checkInternetConnection()) {
-            throw ErrorHandler.createError(
-                ErrorHandler.errorTypes.NETWORK,
-                'No internet connection. Please check your network and try again.',
-                { url },
-                true
-            );
-        }
+        // Note: Removed strict internet check - let yt-dlp handle network errors naturally
+        // This prevents false negatives and reduces latency
 
         return await RetryManager.withRetry(async () => {
             const ytdlpPath = findExecutable(process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
@@ -802,18 +1050,58 @@ ipcMain.handle('fetch-info', async (_event, url) => {
             let err = '';
             
             return await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    try { proc.kill(); } catch {}
-                    reject(new Error('Request timeout - the URL may be invalid or unavailable'));
-                }, 30000); // 30 second timeout
+                // Activity-based timeout: resets when data is received
+                let activityTimeout;
+                const resetActivityTimeout = () => {
+                    if (activityTimeout) clearTimeout(activityTimeout);
+                    activityTimeout = setTimeout(() => {
+                        console.error('[fetch-info] No data received for 60 seconds, aborting');
+                        try { proc.kill(); } catch {}
+                        reject(new Error('Request timeout - the URL may be invalid or unavailable'));
+                    }, 60000); // 60 second activity timeout
+                };
+                
+                resetActivityTimeout(); // Start timeout
 
-                proc.stdout.on('data', d => { out += d.toString(); });
-                proc.stderr.on('data', d => { err += d.toString(); });
+                proc.stdout.on('data', d => { 
+                    out += d.toString();
+                    resetActivityTimeout(); // Reset on data
+                });
+                proc.stderr.on('data', d => { 
+                    err += d.toString();
+                    resetActivityTimeout(); // Reset on data
+                });
                 
                 proc.on('close', (code) => {
-                    clearTimeout(timeout);
+                    if (activityTimeout) clearTimeout(activityTimeout);
                     if (code !== 0) {
-                        reject(new Error(`yt-dlp failed with code ${code}. ${err || 'Unknown error'}`));
+                        console.error(`[fetch-info] yt-dlp failed with code ${code}: ${err || 'Unknown error'}`);
+                        
+                        // Parse stderr for better error messages
+                        let errorMsg = 'Failed to fetch video information';
+                        if (err) {
+                            if (/video unavailable|not available/i.test(err)) {
+                                errorMsg = 'Video is unavailable or does not exist.';
+                            } else if (/private video/i.test(err)) {
+                                errorMsg = 'This is a private video.';
+                            } else if (/invalid url|unsupported url/i.test(err)) {
+                                errorMsg = 'Invalid or unsupported URL.';
+                            } else if (/network|connection|timeout/i.test(err)) {
+                                errorMsg = 'Network error. Please check your internet connection.';
+                            } else if (/sign in/i.test(err)) {
+                                errorMsg = 'This video requires signing in to YouTube.';
+                            } else if (/age.restricted/i.test(err)) {
+                                errorMsg = 'This video is age-restricted.';
+                            } else {
+                                // Use first line of error if meaningful
+                                const firstErrorLine = err.split('\n').find(l => /error/i.test(l) && l.trim().length > 0);
+                                if (firstErrorLine) {
+                                    errorMsg = firstErrorLine.trim().substring(0, 150);
+                                }
+                            }
+                        }
+                        
+                        reject(new Error(errorMsg));
                         return;
                     }
                     
@@ -831,7 +1119,7 @@ ipcMain.handle('fetch-info', async (_event, url) => {
                 });
                 
                 proc.on('error', (error) => {
-                    clearTimeout(timeout);
+                    if (activityTimeout) clearTimeout(activityTimeout);
                     reject(new Error(`yt-dlp failed to run: ${error.message}`));
                 });
             });
@@ -856,15 +1144,8 @@ ipcMain.handle('start-download', async (event, args) => {
 		// Validate URL
 		await ErrorHandler.validateUrl(url);
 		
-		// Check internet connectivity
-		if (!await ErrorHandler.checkInternetConnection()) {
-			throw ErrorHandler.createError(
-				ErrorHandler.errorTypes.NETWORK,
-				'No internet connection. Please check your network and try again.',
-				{ url },
-				true
-			);
-		}
+		// Note: Removed strict internet check - let yt-dlp handle network errors naturally
+		// This prevents false negatives and reduces latency
 
 		// Validate and prepare output directory
 		const outDir = outputDir || appSettings.defaultOutputDir || getDefaultOutputDir();
@@ -890,32 +1171,22 @@ ipcMain.handle('start-download', async (event, args) => {
 				const itemIndex = indices[cursor++];
 				const childId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 				activeDownloads.set(childId, { id: childId, url, format, percent: 0, startedAt: Date.now() });
-				downloadWithYtDlp({ id: childId, url, format, outDir, webContents, quality, abrKbps, playlistStart: itemIndex, playlistEnd: itemIndex })
-					.then(() => { completed++; })
-					.catch(() => { failed++; })
-					.finally(async () => {
-						if (cursor < total) await launchNext();
-						if (completed + failed === total) {
-							broadcast('download-complete', { ok: true, totalItems: total, completed });
-							if (appSettings.showCompleteDialog) {
-								try {
-									const result = await dialog.showMessageBox(mainWindow, {
-										type: 'info',
-										buttons: appSettings.openFolderOnComplete ? ['Open Folder', 'OK'] : ['OK'],
-										defaultId: 0,
-										cancelId: appSettings.openFolderOnComplete ? 1 : 0,
-										title: 'Downloads Complete',
-										message: 'Your downloads are complete.',
-										detail: `${completed} of ${total} item(s) saved to: ${outDir}`
-									});
-									if (appSettings.openFolderOnComplete && result.response === 0) {
-										await shell.openPath(outDir);
-									}
-								} catch {}
-							}
-						}
-					});
-			};
+			downloadWithYtDlp({ id: childId, url, format, outDir, webContents, quality, abrKbps, playlistStart: itemIndex, playlistEnd: itemIndex })
+				.then(() => { completed++; })
+				.catch(() => { failed++; })
+				.finally(async () => {
+					if (cursor < total) await launchNext();
+					if (completed + failed === total) {
+						// Send data to renderer for professional dialog
+						broadcast('download-complete', { 
+							ok: true, 
+							totalItems: total, 
+							completed, 
+							outDir 
+						});
+					}
+				});
+		};
 			const starters = [];
 			for (let k = 0; k < CONCURRENCY; k++) starters.push(launchNext());
 			await Promise.all(starters);
@@ -930,21 +1201,13 @@ ipcMain.handle('start-download', async (event, args) => {
 			if (stats && stats.cancelled) {
 				return { ok: true, cancelled: true };
 			}
-			broadcast('download-complete', { ok: true, ...stats });
-			if (appSettings.showCompleteDialog) {
-				const result = await dialog.showMessageBox(mainWindow, {
-					type: 'info',
-					buttons: appSettings.openFolderOnComplete ? ['Open Folder', 'OK'] : ['OK'],
-					defaultId: 0,
-					cancelId: appSettings.openFolderOnComplete ? 1 : 0,
-					title: 'Downloads Complete',
-					message: 'Your download is complete.',
-					detail: `${stats.completed} item(s) saved to: ${outDir}`
-				});
-				if (appSettings.openFolderOnComplete && result.response === 0) {
-					await shell.openPath(outDir);
-				}
-			}
+		// Send data to renderer for professional dialog
+		broadcast('download-complete', { 
+			ok: true, 
+			...stats,
+			totalItems: stats.completed || 1,
+			outDir 
+		});
 			return { ok: true, ...stats };
 		} catch (err) {
 			broadcast('download-error', { message: err?.message || String(err) });
@@ -1138,15 +1401,22 @@ async function downloadWithYtDlp({ id, url, format, outDir, webContents, quality
 			});
 		};
 
-		const child = spawn(ytdlpPath, isMp3 ? mp3Args : mp4Args, { stdio: ['ignore', 'pipe', 'pipe'] });
-		downloadProcesses.set(id, child);
-		child.stdout.on('data', parseAndEmit);
-		child.stderr.on('data', parseAndEmit);
-		child.on('error', reject);
+	let stderrOutput = '';
+	const child = spawn(ytdlpPath, isMp3 ? mp3Args : mp4Args, { stdio: ['ignore', 'pipe', 'pipe'] });
+	downloadProcesses.set(id, child);
+	child.stdout.on('data', parseAndEmit);
+	child.stderr.on('data', (data) => {
+		const text = data?.toString?.() || '';
+		stderrOutput += text;
+		parseAndEmit(data);
+	});
+	child.on('error', (err) => {
+		reject(new Error(`Failed to start yt-dlp: ${err.message}`));
+	});
         child.on('close', (code) => {
-			downloadProcesses.delete(id);
-			const obj = activeDownloads.get(id);
-			if (obj) activeDownloads.delete(id);
+		downloadProcesses.delete(id);
+		const obj = activeDownloads.get(id);
+		if (obj) activeDownloads.delete(id);
             const reason = terminationReasons.get(id);
             if (reason === 'cancelled') {
                 terminationReasons.delete(id);
@@ -1155,30 +1425,57 @@ async function downloadWithYtDlp({ id, url, format, outDir, webContents, quality
                 return resolve({ cancelled: true });
             }
             if (code === 0) {
-				// Save history entries for each destination completed (or single)
-				const entries = completedDests.size ? Array.from(completedDests) : (obj?.path ? [obj.path] : []);
-				const when = Date.now();
-				for (const dest of entries) {
-					const parsed = path.parse(dest);
-					downloadsHistory.push({
-						title: parsed?.name || obj?.title || 'download',
-						path: dest,
-						format,
-						size: lastSize,
-						completedAt: when
-					});
-					// Cleanup residual intermediate files on Windows if any (e.g., .f234.mp4, .temp.mp4)
-					try {
-						cleanupResidualFiles(parsed.name, path.dirname(dest));
-					} catch {}
-				}
-				saveHistory();
-				resolve({ totalItems: totalItems || (completedDests.size || 1), completed: completedDests.size || 1 });
+			// Save history entries for each destination completed (or single)
+			const entries = completedDests.size ? Array.from(completedDests) : (obj?.path ? [obj.path] : []);
+			const when = Date.now();
+			for (const dest of entries) {
+				const parsed = path.parse(dest);
+				downloadsHistory.push({
+					title: parsed?.name || obj?.title || 'download',
+					path: dest,
+					format,
+					size: lastSize,
+					completedAt: when
+				});
+				// Cleanup residual intermediate files on Windows if any (e.g., .f234.mp4, .temp.mp4)
+				try {
+					cleanupResidualFiles(parsed.name, path.dirname(dest));
+				} catch {}
+			}
+			saveHistory();
+			resolve({ totalItems: totalItems || (completedDests.size || 1), completed: completedDests.size || 1 });
             } else {
-                reject(new Error(`yt-dlp exited with code ${code}`));
+                // Parse stderr for better error messages
+                let errorMsg = 'Download failed';
+                if (stderrOutput) {
+                    if (/unable to download/i.test(stderrOutput)) {
+                        errorMsg = 'Unable to download video. It may be unavailable or restricted.';
+                    } else if (/private video/i.test(stderrOutput)) {
+                        errorMsg = 'This is a private video and cannot be downloaded.';
+                    } else if (/video unavailable/i.test(stderrOutput)) {
+                        errorMsg = 'Video is unavailable.';
+                    } else if (/copyright/i.test(stderrOutput)) {
+                        errorMsg = 'Video cannot be downloaded due to copyright restrictions.';
+                    } else if (/network|connection|timeout/i.test(stderrOutput)) {
+                        errorMsg = 'Network error. Please check your internet connection.';
+                    } else if (/sign in/i.test(stderrOutput)) {
+                        errorMsg = 'This video requires signing in to YouTube.';
+                    } else if (/age.restricted/i.test(stderrOutput)) {
+                        errorMsg = 'This video is age-restricted and cannot be downloaded.';
+                    } else {
+                        // Extract first meaningful error line
+                        const errorLines = stderrOutput.split('\n').filter(l => /error/i.test(l) && l.trim().length > 0);
+                        if (errorLines.length > 0) {
+                            errorMsg = errorLines[0].trim().substring(0, 200);
+                        } else {
+                            errorMsg = `yt-dlp exited with code ${code}`;
+                        }
+                    }
+                }
+                reject(new Error(errorMsg));
             }
-		});
 	});
+});
 }
 
 function cleanupResidualFiles(baseName, dirPath) {
@@ -1259,32 +1556,36 @@ async function probeFormats(url) {
     });
 }
 
-// Helper function to find executables in both development and production
+// Helper function to find executables - ONLY local, never system PATH
 function findExecutable(execName) {
-    // First try the main app directory (for development)
-    const mainDirPath = path.join(process.cwd(), execName);
-    if (fs.existsSync(mainDirPath)) {
-        console.log(`[findExecutable] Found ${execName} in main directory: ${mainDirPath}`);
-        return mainDirPath;
+    if (!dependencyManager) {
+        console.error('[findExecutable] DependencyManager not initialized!');
+        return null;
+    }
+
+    // Get path from dependency manager
+    if (execName.includes('yt-dlp')) {
+        const ytdlpPath = dependencyManager.getYtDlpPath();
+        if (ytdlpPath) {
+            console.log(`[findExecutable] Found yt-dlp at: ${ytdlpPath}`);
+            return ytdlpPath;
+        }
+        console.error('[findExecutable] yt-dlp not found in local directory');
+        return null;
     }
     
-    // Try the app resources directory (for production)
-    const resourcesPath = path.join(process.resourcesPath, execName);
-    if (fs.existsSync(resourcesPath)) {
-        console.log(`[findExecutable] Found ${execName} in resources: ${resourcesPath}`);
-        return resourcesPath;
+    if (execName.includes('ffmpeg')) {
+        const ffmpegPath = dependencyManager.getFfmpegPath();
+        if (ffmpegPath) {
+            console.log(`[findExecutable] Found ffmpeg at: ${ffmpegPath}`);
+            return ffmpegPath;
+        }
+        console.error('[findExecutable] ffmpeg not found in local directory');
+        return null;
     }
-    
-    // Try the app.asar.unpacked directory (for production with unpacked resources)
-    const unpackedPath = path.join(process.resourcesPath, 'app.asar.unpacked', execName);
-    if (fs.existsSync(unpackedPath)) {
-        console.log(`[findExecutable] Found ${execName} in unpacked: ${unpackedPath}`);
-        return unpackedPath;
-    }
-    
-    // Try the system PATH as last resort
-    console.log(`[findExecutable] ${execName} not found in any local directory, using system PATH`);
-    return execName;
+
+    console.error(`[findExecutable] Unknown executable: ${execName}`);
+    return null;
 }
 
 

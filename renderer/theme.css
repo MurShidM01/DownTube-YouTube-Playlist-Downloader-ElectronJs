@@ -11,13 +11,13 @@ html[data-theme="light"] {
 }
 
 html[data-theme="dark"] {
-	--bg-grad: linear-gradient(to bottom, #0b1220, #0b1220);
-	--panel: #0f172a;
-	--text: #e2e8f0;
-	--muted: #94a3b8;
-	--border: #1f2937;
-	--brand: #4f46e5;
-	--accent: #06b6d4;
+	--bg-grad: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+	--panel: #1e293b;
+	--text: #f1f5f9;
+	--muted: #cbd5e1;
+	--border: #334155;
+	--brand: #3b82f6;
+	--accent: #8b5cf6;
 }
 
 html[data-theme="sunset"] {
@@ -110,7 +110,14 @@ html, body { border-radius: 16px; }
 input[name="format"]:checked + .format-pill { color: var(--brand); border-color: var(--brand); }
 
 /* Disabled primary button visual (blurred and non-clickable) */
-.disabled-btn { filter: blur(0.6px) grayscale(20%); opacity: 0.6; pointer-events: none; }
+.disabled-btn { 
+	filter: blur(0.6px) grayscale(30%); 
+	opacity: 0.5; 
+	pointer-events: none; 
+	cursor: not-allowed;
+	transform: none !important;
+	box-shadow: none !important;
+}
 
 /* Stylish bottom nav, themed */
 .bottom-nav { background-color: color-mix(in srgb, var(--panel), #000 4%); border: 1px solid var(--border); box-shadow: 0 8px 30px rgba(2,6,23,0.06); }
@@ -134,5 +141,60 @@ html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--brand), 
 .range-thumb::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 999px; background: var(--panel); border: 2px solid var(--brand); margin-top: -5px; pointer-events: auto; cursor: pointer; }
 .range-thumb::-moz-range-track { height: 4px; background: transparent; }
 .range-thumb::-moz-range-thumb { width: 14px; height: 14px; border-radius: 999px; background: var(--panel); border: 2px solid var(--brand); pointer-events: auto; cursor: pointer; }
+
+/* Utility classes */
+.line-clamp-1 {
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/* Smooth transitions for interactive elements */
+button, a, input, select {
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced focus states */
+input:focus, select:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Disabled select dropdown */
+select:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	background-color: #f1f5f9;
+}
+
+/* Professional card shadows on hover */
+.theme-card:hover {
+	box-shadow: 0 12px 40px rgba(2, 6, 23, 0.08) !important;
+	transform: translateY(-1px);
+	transition: all 0.3s ease;
+}
+
+/* Gradient text effect for headings */
+.gradient-text {
+	background: linear-gradient(135deg, var(--brand), var(--accent));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+.animate-spin {
+	animation: spin 1s linear infinite;
+}
+
+/* Dialog animations */
+@keyframes fadeOut {
+	from { opacity: 1; }
+	to { opacity: 0; }
+}
 
 

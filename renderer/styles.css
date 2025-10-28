@@ -101,4 +101,68 @@ body {
 	.row { grid-template-columns: 1fr; }
 }
 
+/* Notification styles */
+.notification {
+	position: fixed;
+	top: 80px;
+	left: 50%;
+	transform: translateX(-50%);
+	min-width: 400px;
+	max-width: 600px;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	box-shadow: 0 20px 40px rgba(2, 6, 23, 0.12), 0 4px 12px rgba(2,6,23,0.08);
+	padding: 16px 20px;
+	z-index: 10000;
+	animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+}
+
+.notification-content {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.notification-title {
+	font-weight: 700;
+	font-size: 14px;
+	color: var(--text);
+}
+
+.notification-message {
+	font-size: 13px;
+	color: var(--muted);
+}
+
+.notification-info {
+	border-left: 4px solid var(--brand);
+}
+
+.notification-error {
+	border-left: 4px solid var(--accent);
+}
+
+.notification-error .notification-title {
+	color: var(--accent);
+}
+
+@media (max-width: 660px) {
+	.notification {
+		min-width: 90%;
+		max-width: 90%;
+	}
+}
+
 

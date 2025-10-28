@@ -3,25 +3,66 @@ async function refreshDownloads() {
 	if (!list) return;
 	const items = await window.downTube.getActiveDownloads();
 	list.innerHTML = '';
+	
+	if (items.length === 0) {
+		list.innerHTML = `
+			<div class="text-center py-8 text-slate-400">
+				<svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+				</svg>
+				<p class="text-sm font-semibold">No active downloads</p>
+				<p class="text-xs mt-1">Start a download from the Home page</p>
+			</div>
+		`;
+		return;
+	}
+	
     for (const d of items) {
-		const li = document.createElement('li');
-		li.className = 'mb-3';
+		const card = document.createElement('div');
+		card.className = 'bg-white border-2 border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all';
 		const pct = Math.max(0, Math.min(100, Math.round(d.percent || 0)));
 		const title = String(d.title || d.url || '').replace(/[&<>]/g, s => ({'&': '&amp;','<': '&lt;','>': '&gt;'}[s]));
-        li.innerHTML = `
-			<div class="flex items-center justify-between text-sm">
-                <span class="font-medium text-slate-800">${title}</span>
-                <div class="flex items-center gap-2">
-                    <button class="dt-cancel text-slate-600 hover:text-rose-600" title="Cancel" data-id="${d.id}">✖</button>
-                    <span class="text-slate-600">${d.indeterminate ? '...' : pct + '%'}</span>
+        card.innerHTML = `
+			<div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex-1 min-w-0">
+					<h3 class="font-bold text-slate-800 text-sm line-clamp-1 mb-1" title="${title}">${title}</h3>
+					<div class="flex items-center gap-3 text-xs text-slate-500">
+						${d.indeterminate ? '<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Converting...</span>' : `
+						<span class="flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+							</svg>
+							${d.size || '—'}
+						</span>
+						<span class="flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+							</svg>
+							${d.speed || '—'}
+						</span>
+						<span class="flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+							</svg>
+							${d.eta || '—'}
+						</span>
+						`}
+					</div>
+				</div>
+                <div class="flex items-center gap-3">
+                    <button class="dt-cancel p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Cancel Download" data-id="${d.id}">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+                    <span class="text-sm font-bold ${d.indeterminate ? 'text-blue-600' : 'text-slate-800'} min-w-[3rem] text-right">${d.indeterminate ? '...' : pct + '%'}</span>
                 </div>
 			</div>
-            <div class="h-2 bg-slate-100 rounded-full overflow-hidden mt-1">
-                <div class="h-full download-bar" style="width:${d.indeterminate ? '100%' : pct + '%'}"></div>
+            <div class="h-3 bg-gradient-to-r from-slate-100 to-slate-50 rounded-full overflow-hidden border border-slate-200">
+                <div class="h-full download-bar ${d.indeterminate ? 'animate-pulse' : ''}" style="width:${d.indeterminate ? '100%' : pct + '%'}"></div>
 			</div>
-            <div class="text-xs text-slate-600 mt-1">${d.indeterminate ? 'Converting…' : `Size: ${d.size || '—'} • Speed: ${d.speed || '—'} • ETA: ${d.eta || '—'}`}</div>
 		`;
-		list.appendChild(li);
+		list.appendChild(card);
 	}
 
     // wire cancel
@@ -39,11 +80,308 @@ async function refreshHistory() {
 	if (!list) return;
 	const items = await window.downTube.getHistory();
 	list.innerHTML = '';
+	
+	if (items.length === 0) {
+		list.innerHTML = `
+			<div class="text-center py-12 text-slate-400">
+				<svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+				</svg>
+				<p class="text-sm font-medium">No downloads yet</p>
+				<p class="text-xs mt-1">Downloaded files will appear here</p>
+			</div>
+		`;
+		return;
+	}
+	
 	for (const h of [...items].reverse().slice(0, 100)) {
-		const li = document.createElement('li');
+		const card = document.createElement('div');
+		card.className = 'group bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-lg p-3 hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-default';
+		
 		const when = new Date(h.completedAt).toLocaleString();
-		li.textContent = `${h.title} • ${h.format?.toUpperCase?.() || ''} • ${h.size || ''} • ${when}`;
-		list.appendChild(li);
+		const formatUpper = h.format?.toUpperCase?.() || 'FILE';
+		const formatColor = formatUpper === 'MP4' ? 'bg-blue-100 text-blue-700 border-blue-200' : 
+		                   formatUpper === 'MP3' ? 'bg-purple-100 text-purple-700 border-purple-200' : 
+		                   'bg-gray-100 text-gray-700 border-gray-200';
+		
+		const icon = formatUpper === 'MP4' ? 
+			`<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6.47L5.76 10H20v8H4V6.47M22 4h-4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4z"/></svg>` :
+			`<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`;
+		
+		card.innerHTML = `
+			<div class="flex items-start gap-3">
+				<div class="${formatColor} border rounded-lg p-2 flex-shrink-0 group-hover:scale-110 transition-transform">
+					${icon}
+				</div>
+				<div class="flex-1 min-w-0">
+					<div class="flex items-start justify-between gap-2">
+						<h3 class="font-semibold text-slate-800 text-sm line-clamp-1 group-hover:text-sky-600 transition-colors" title="${escapeHtml(h.title)}">
+							${escapeHtml(h.title)}
+						</h3>
+						<span class="text-xs font-medium ${formatColor} px-2 py-0.5 rounded-full border flex-shrink-0">
+							${formatUpper}
+						</span>
+					</div>
+					<div class="flex items-center gap-3 mt-1.5 text-xs text-slate-500">
+						<span class="flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+							</svg>
+							${formatTime(when)}
+						</span>
+						${h.size ? `
+						<span class="flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+							</svg>
+							${h.size}
+						</span>
+						` : ''}
+					</div>
+				</div>
+			</div>
+		`;
+		
+		// Add click to open folder - use inline onclick for better reliability
+		if (h.path) {
+			card.style.cursor = 'pointer';
+			card.title = 'Click to show in folder';
+			card.onclick = async () => {
+				try {
+					await window.downTube.showItemInFolder(h.path);
+				} catch (err) {
+					console.error('Failed to open folder:', err);
+					// Show error notification
+					const toast = document.createElement('div');
+					toast.textContent = 'Failed to open folder';
+					toast.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+					document.body.appendChild(toast);
+					setTimeout(() => toast.remove(), 2000);
+				}
+			};
+		} else {
+			card.style.cursor = 'default';
+		}
+		
+		list.appendChild(card);
+	}
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+	const div = document.createElement('div');
+	div.textContent = text;
+	return div.innerHTML;
+}
+
+// Professional confirmation dialog
+function showConfirmDialog(title, message, confirmText, cancelText) {
+    return new Promise((resolve) => {
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm';
+        overlay.style.animation = 'fadeIn 0.2s ease';
+        
+        // Create dialog
+        const dialog = document.createElement('div');
+        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform';
+        dialog.style.animation = 'slideUp 0.3s ease';
+        
+        dialog.innerHTML = `
+            <div class="flex items-start gap-4 mb-4">
+                <div class="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">${title}</h3>
+                    <p class="text-sm text-slate-600">${message}</p>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button id="dialog-cancel" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-all">
+                    ${cancelText}
+                </button>
+                <button id="dialog-confirm" class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 text-white font-bold hover:from-red-700 hover:to-red-800 shadow-lg shadow-red-200 transition-all transform hover:scale-105 active:scale-95">
+                    ${confirmText}
+                </button>
+            </div>
+        `;
+        
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        `;
+        document.head.appendChild(style);
+        
+        // Handle buttons
+        const confirmBtn = dialog.querySelector('#dialog-confirm');
+        const cancelBtn = dialog.querySelector('#dialog-cancel');
+        
+        const cleanup = () => {
+            overlay.style.animation = 'fadeOut 0.2s ease';
+            setTimeout(() => {
+                overlay.remove();
+                style.remove();
+            }, 200);
+        };
+        
+        confirmBtn.onclick = () => {
+            cleanup();
+            resolve(true);
+        };
+        
+        cancelBtn.onclick = () => {
+            cleanup();
+            resolve(false);
+        };
+        
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve(false);
+            }
+        };
+    });
+}
+
+// Show download complete dialog
+function showDownloadCompleteDialog(data) {
+    return new Promise((resolve) => {
+        const { completed, total, outDir } = data;
+        
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm';
+        overlay.style.animation = 'fadeIn 0.2s ease';
+        
+        // Create dialog
+        const dialog = document.createElement('div');
+        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform';
+        dialog.style.animation = 'slideUp 0.3s ease';
+        
+        const successIcon = `
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        `;
+        
+        dialog.innerHTML = `
+            <div class="flex items-start gap-4 mb-4">
+                <div class="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg shadow-green-200">
+                    ${successIcon}
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">Downloads Complete!</h3>
+                    <p class="text-sm text-slate-600 mb-3">Your downloads have finished successfully.</p>
+                    <div class="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-lg p-3 space-y-2 text-xs">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-slate-700"><strong>${completed}</strong> of <strong>${total}</strong> item(s) completed</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                            </svg>
+                            <span class="text-slate-600 break-all" title="${outDir}">${outDir}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button id="dialog-ok" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-all">
+                    Close
+                </button>
+                <button id="dialog-open-folder" class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Open Folder
+                </button>
+            </div>
+        `;
+        
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        `;
+        document.head.appendChild(style);
+        
+        // Handle buttons
+        const okBtn = dialog.querySelector('#dialog-ok');
+        const openFolderBtn = dialog.querySelector('#dialog-open-folder');
+        
+        const cleanup = () => {
+            overlay.style.animation = 'fadeOut 0.2s ease';
+            setTimeout(() => {
+                overlay.remove();
+                style.remove();
+            }, 200);
+        };
+        
+        okBtn.onclick = () => {
+            cleanup();
+            resolve('ok');
+        };
+        
+        openFolderBtn.onclick = () => {
+            cleanup();
+            resolve('open-folder');
+        };
+        
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve('ok');
+            }
+        };
+    });
+}
+
+// Helper function to format time in a friendly way
+function formatTime(dateString) {
+	try {
+		const date = new Date(dateString);
+		
+		// Check if date is valid
+		if (isNaN(date.getTime())) {
+			return 'Recently';
+		}
+		
+		const now = new Date();
+		const diffMs = now - date;
+		const diffMins = Math.floor(diffMs / 60000);
+		const diffHours = Math.floor(diffMs / 3600000);
+		const diffDays = Math.floor(diffMs / 86400000);
+		
+		if (diffMins < 1) return 'Just now';
+		if (diffMins < 60) return `${diffMins} min ago`;
+		if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+		if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+		
+		// Return formatted date with time
+		return date.toLocaleDateString(undefined, { 
+			month: 'short', 
+			day: 'numeric', 
+			year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+		});
+	} catch (error) {
+		console.error('Error formatting time:', error);
+		return 'Recently';
 	}
 }
 
@@ -53,12 +391,47 @@ async function init() {
 	await loadCurrentSettings();
 	
 	const clearBtn = document.getElementById('clear-history');
-	if (clearBtn) clearBtn.onclick = async () => { await window.downTube.clearHistory(); await refreshHistory(); };
+	if (clearBtn) {
+		clearBtn.onclick = async () => {
+			// Show confirmation dialog
+			const confirmed = await showConfirmDialog(
+				'Clear Download History',
+				'Are you sure you want to clear all download history? This action cannot be undone.',
+				'Clear',
+				'Cancel'
+			);
+			
+			if (confirmed) {
+				await window.downTube.clearHistory();
+				await refreshHistory();
+			}
+		};
+	}
 
 	// Single subscriptions; refresh efficiently
 	window.downTube.onProgress(async () => { await refreshDownloads(); });
 	window.downTube.onItemComplete(async () => { await refreshDownloads(); await refreshHistory(); });
-	window.downTube.onDone(async () => { await refreshDownloads(); await refreshHistory(); });
+	window.downTube.onDone(async (data) => { 
+		await refreshDownloads(); 
+		await refreshHistory(); 
+		
+		// Show download complete dialog if data includes completion info
+		if (data && data.completed !== undefined && data.totalItems !== undefined && data.outDir) {
+			const action = await showDownloadCompleteDialog({
+				completed: data.completed,
+				total: data.totalItems,
+				outDir: data.outDir
+			});
+			
+			if (action === 'open-folder' && data.outDir) {
+				try {
+					await window.downTube.openPath(data.outDir);
+				} catch (error) {
+					console.error('Error opening folder:', error);
+				}
+			}
+		}
+	});
 	window.downTube.onError(async () => { await refreshDownloads(); });
 
 	// Check for updates and show notification if available
