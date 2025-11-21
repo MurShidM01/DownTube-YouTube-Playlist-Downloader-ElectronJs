@@ -90,17 +90,340 @@ html, body { border-radius: 16px; }
 /* Card/panel surfaces */
 .theme-card { background-color: var(--panel) !important; border-color: var(--border) !important; color: var(--text) !important; }
 
+/* Force all cards and white backgrounds to use theme */
+.bg-white,
+.card,
+section,
+.panel,
+div[class*="bg-white"] {
+	background-color: var(--panel) !important;
+}
+
 /* Override common Tailwind utility colors to match theme */
 .bg-white { background-color: var(--panel) !important; }
 .border-slate-200 { border-color: var(--border) !important; }
 .ring-slate-200 { --tw-ring-color: var(--border) !important; }
 .bg-slate-100 { background-color: color-mix(in srgb, var(--panel), #000 5%) !important; }
-.hover\:bg-slate-50:hover { background-color: color-mix(in srgb, var(--panel), #000 3%) !important; }
+.bg-slate-50 { background-color: color-mix(in srgb, var(--panel), #000 3%) !important; }
+.hover\:bg-slate-50:hover { background-color: color-mix(in srgb, var(--panel), #000 6%) !important; }
+.hover\:bg-white:hover { background-color: color-mix(in srgb, var(--panel), #000 6%) !important; }
 .text-slate-900 { color: var(--text) !important; }
 .text-slate-800 { color: var(--text) !important; }
 .text-slate-700 { color: var(--text) !important; opacity: 0.9; }
 .text-slate-600 { color: var(--muted) !important; }
-.text-slate-500 { color: color-mix(in srgb, var(--muted), #000 10%) !important; }
+.text-slate-500 { color: var(--muted) !important; opacity: 0.8; }
+.text-slate-400 { color: var(--muted) !important; opacity: 0.7; }
+
+/* Additional color overrides for dark theme */
+.bg-slate-900 { background-color: color-mix(in srgb, var(--panel), #000 20%) !important; }
+.bg-slate-800 { background-color: color-mix(in srgb, var(--panel), #000 15%) !important; }
+.hover\:bg-slate-800:hover { background-color: color-mix(in srgb, var(--panel), #000 25%) !important; }
+.border-slate-300 { border-color: var(--border) !important; }
+.hover\:border-slate-300:hover { border-color: color-mix(in srgb, var(--border), #fff 10%) !important; }
+
+/* Buttons and interactive elements */
+button {
+	color: inherit;
+}
+
+/* Fix white text on light backgrounds in dark theme */
+html[data-theme="dark"] .text-white {
+	color: var(--text) !important;
+}
+
+html[data-theme="dark"] .bg-slate-50 {
+	background-color: #1a2332 !important;
+}
+
+html[data-theme="dark"] .bg-slate-100 {
+	background-color: #1f2937 !important;
+}
+
+/* Gradients should respect theme in dark mode */
+html[data-theme="dark"] .bg-gradient-to-r,
+html[data-theme="dark"] .bg-gradient-to-br {
+	filter: brightness(0.9);
+}
+
+/* Fix hardcoded backgrounds in gradients */
+.bg-gradient-to-br,
+.bg-gradient-to-b,
+.bg-gradient-to-r {
+	background-image: none !important;
+	background-color: var(--panel) !important;
+}
+
+/* All colored gradient backgrounds - theme aware */
+.from-blue-50,
+.from-sky-50,
+.from-cyan-50,
+.from-purple-50,
+.from-pink-50,
+.from-green-50,
+.from-emerald-50,
+.from-orange-50,
+.from-amber-50,
+.from-indigo-50,
+.to-blue-50,
+.to-sky-50,
+.to-cyan-50,
+.to-pink-50,
+.to-emerald-50,
+.to-amber-50,
+.via-blue-50 {
+	background: color-mix(in srgb, var(--panel), var(--brand) 5%) !important;
+}
+
+/* Header backdrop blur backgrounds */
+.supports-\[backdrop-filter\]\:bg-white\/70 {
+	background-color: color-mix(in srgb, var(--panel), transparent 30%) !important;
+}
+
+/* Specific overrides for Downloads and Settings pages */
+.from-slate-50,
+.to-white,
+.from-slate-50\/70 {
+	background: var(--panel) !important;
+}
+
+/* Icon colors that need theme awareness */
+.text-rose-600 {
+	color: var(--accent) !important;
+}
+
+.text-blue-600,
+.text-blue-700,
+.text-blue-900,
+.text-purple-600,
+.text-purple-700,
+.text-green-600,
+.text-green-700,
+.text-orange-600,
+.text-amber-600,
+.text-indigo-600 {
+	color: var(--brand) !important;
+}
+
+.text-red-700 {
+	color: var(--accent) !important;
+}
+
+/* Green/update notification backgrounds */
+.from-green-50,
+.to-emerald-50,
+.from-green-100,
+.to-emerald-100 {
+	background: color-mix(in srgb, var(--brand), var(--panel) 70%) !important;
+}
+
+.border-green-200,
+.border-red-300,
+.border-blue-200,
+.border-purple-200,
+.border-orange-200,
+.border-indigo-300 {
+	border-color: var(--border) !important;
+}
+
+.hover\:bg-red-50:hover {
+	background-color: color-mix(in srgb, var(--accent), var(--panel) 90%) !important;
+}
+
+.hover\:text-red-700:hover {
+	color: var(--accent) !important;
+}
+
+/* Button backgrounds */
+.bg-slate-900 {
+	background-color: var(--brand) !important;
+}
+
+.hover\:bg-slate-800:hover {
+	background-color: color-mix(in srgb, var(--brand), #000 20%) !important;
+}
+
+/* Fix all gradient buttons to use theme colors */
+.from-sky-600,
+.to-blue-600,
+.hover\:from-sky-700:hover,
+.hover\:to-blue-700:hover,
+.from-purple-600,
+.to-purple-700,
+.hover\:from-purple-700:hover,
+.hover\:to-purple-800:hover,
+.from-green-600,
+.to-emerald-600,
+.hover\:from-green-700:hover,
+.hover\:to-emerald-700:hover {
+	--tw-gradient-from: var(--brand) !important;
+	--tw-gradient-to: var(--accent) !important;
+}
+
+/* Override button gradient classes specifically */
+button.bg-gradient-to-r,
+button[class*="bg-gradient"] {
+	background-image: linear-gradient(to right, var(--brand), var(--accent)) !important;
+}
+
+/* Button shadows use theme colors */
+.shadow-sky-200,
+.shadow-slate-200,
+.shadow-purple-200,
+.shadow-green-200,
+.shadow-amber-200 {
+	--tw-shadow-color: color-mix(in srgb, var(--brand), transparent 70%) !important;
+}
+
+/* Update notification button */
+.from-green-50.to-emerald-50 {
+	background: color-mix(in srgb, var(--brand), var(--panel) 90%) !important;
+}
+
+.hover\:from-green-100:hover,
+.hover\:to-emerald-100:hover {
+	background: color-mix(in srgb, var(--brand), var(--panel) 85%) !important;
+}
+
+.text-green-700 {
+	color: var(--brand) !important;
+}
+
+/* Clear history button hover states */
+.hover\:border-red-300:hover {
+	border-color: var(--accent) !important;
+}
+
+.hover\:bg-red-50:hover {
+	background-color: color-mix(in srgb, var(--accent), var(--panel) 95%) !important;
+}
+
+.hover\:text-red-700:hover {
+	color: var(--accent) !important;
+}
+
+/* Fix colored shadow utilities for dark theme */
+html[data-theme="dark"] .shadow-sky-200,
+html[data-theme="dark"] .shadow-blue-200,
+html[data-theme="dark"] .shadow-green-200,
+html[data-theme="dark"] .shadow-red-200,
+html[data-theme="dark"] .shadow-purple-200,
+html[data-theme="dark"] .shadow-slate-200 {
+	--tw-shadow-color: rgba(0, 0, 0, 0.3) !important;
+	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Shadow inner - theme aware */
+.shadow-inner {
+	box-shadow: inset 0 2px 4px 0 color-mix(in srgb, #000, transparent 85%) !important;
+}
+
+/* Fix focus ring colors */
+.focus\:ring-purple-100:focus,
+.focus\:ring-sky-100:focus {
+	--tw-ring-color: color-mix(in srgb, var(--brand), transparent 70%) !important;
+}
+
+.focus\:border-purple-400:focus,
+.focus\:border-sky-400:focus {
+	border-color: var(--brand) !important;
+}
+
+/* Fix hardcoded text colors in Settings/About sections */
+.text-indigo-900 {
+	color: var(--text) !important;
+}
+
+/* Lists and ordered lists */
+ol, ul {
+	color: var(--text);
+}
+
+li strong {
+	color: var(--text) !important;
+}
+
+/* Ensure all text respects theme */
+p, span, div, h1, h2, h3, h4, h5, h6 {
+	color: inherit;
+}
+
+/* Fix specific info box heading colors */
+h3.text-indigo-900,
+h3.text-slate-800 {
+	color: var(--text) !important;
+}
+
+/* Fix all small bullet icons to use theme brand color */
+svg.text-purple-600,
+svg.text-green-600,
+svg.text-orange-600,
+svg.text-indigo-600,
+svg.text-blue-600 {
+	color: var(--brand) !important;
+}
+
+/* Fix empty state text colors (from downloads.js) */
+.text-xs,
+.text-sm {
+	color: inherit;
+}
+
+/* Icon gradient backgrounds - theme aware */
+.from-blue-500,
+.from-blue-600,
+.to-blue-600,
+.to-blue-700,
+.from-purple-500,
+.from-purple-600,
+.to-purple-600,
+.to-purple-700,
+.from-green-500,
+.from-green-600,
+.to-emerald-600,
+.from-sky-600,
+.to-blue-600,
+.from-amber-500,
+.to-orange-600 {
+	--tw-gradient-from: var(--brand) !important;
+	--tw-gradient-to: var(--accent) !important;
+}
+
+/* Override all gradient icon containers */
+div[class*="bg-gradient-to-br"] {
+	background-image: linear-gradient(to bottom right, var(--brand), var(--accent)) !important;
+}
+
+/* Ensure icon SVGs stay white */
+div[class*="bg-gradient-to-br"] svg {
+	color: white !important;
+}
+
+/* Shadow colors for icon containers */
+.shadow-blue-200,
+.shadow-purple-200,
+.shadow-green-200,
+.shadow-sky-200,
+.shadow-amber-200,
+.shadow-orange-200 {
+	--tw-shadow-color: color-mix(in srgb, var(--brand), transparent 70%) !important;
+}
+
+/* Light themes keep colored shadows */
+html[data-theme="light"] .shadow-blue-200,
+html[data-theme="sunset"] .shadow-blue-200,
+html[data-theme="desert"] .shadow-blue-200,
+html[data-theme="ocean"] .shadow-blue-200,
+html[data-theme="lavender"] .shadow-blue-200,
+html[data-theme="solarized"] .shadow-blue-200,
+html[data-theme="light"] .shadow-purple-200,
+html[data-theme="sunset"] .shadow-purple-200,
+html[data-theme="desert"] .shadow-purple-200,
+html[data-theme="ocean"] .shadow-purple-200,
+html[data-theme="lavender"] .shadow-purple-200,
+html[data-theme="solarized"] .shadow-purple-200 {
+	--tw-shadow-color: color-mix(in srgb, var(--brand), transparent 70%) !important;
+	box-shadow: 0 8px 20px color-mix(in srgb, var(--brand), transparent 70%) !important;
+}
 
 /* Download progress bar uses theme brand->accent gradient */
 .download-bar { background-image: linear-gradient(90deg, var(--brand), var(--accent)) !important; }
@@ -119,8 +442,40 @@ input[name="format"]:checked + .format-pill { color: var(--brand); border-color:
 	box-shadow: none !important;
 }
 
+/* Disabled button states */
+button:disabled,
+button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	filter: grayscale(50%);
+}
+
+button:disabled:hover,
+button.disabled:hover {
+	transform: none !important;
+}
+
 /* Stylish bottom nav, themed */
-.bottom-nav { background-color: color-mix(in srgb, var(--panel), #000 4%); border: 1px solid var(--border); box-shadow: 0 8px 30px rgba(2,6,23,0.06); }
+.bottom-nav { 
+	background-color: color-mix(in srgb, var(--panel), #000 4%); 
+	border: 1px solid var(--border);
+}
+
+/* Light themes - subtle shadow */
+html[data-theme="light"] .bottom-nav,
+html[data-theme="sunset"] .bottom-nav,
+html[data-theme="desert"] .bottom-nav,
+html[data-theme="ocean"] .bottom-nav,
+html[data-theme="lavender"] .bottom-nav,
+html[data-theme="solarized"] .bottom-nav {
+	box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
+}
+
+/* Dark theme - darker shadow */
+html[data-theme="dark"] .bottom-nav {
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
 .bottom-nav a { color: var(--muted); }
 .bottom-nav a.active { color: var(--brand); border-bottom: 2px solid var(--brand); }
 .bottom-nav a:hover { background-color: color-mix(in srgb, var(--panel), #000 5%); }
@@ -155,24 +510,72 @@ button, a, input, select {
 	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Enhanced focus states */
-input:focus, select:focus {
-	outline: none;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
+/* Enhanced focus states - removed duplicate, handled above */
 
 /* Disabled select dropdown */
 select:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;
-	background-color: #f1f5f9;
+	background-color: color-mix(in srgb, var(--panel), #000 8%) !important;
 }
 
-/* Professional card shadows on hover */
+/* Input and select elements - theme aware */
+input, select, textarea {
+	background-color: var(--panel) !important;
+	color: var(--text) !important;
+	border-color: var(--border) !important;
+}
+
+input::placeholder {
+	color: var(--muted) !important;
+	opacity: 0.6;
+}
+
+/* Focus states */
+input:focus, select:focus, textarea:focus {
+	border-color: var(--brand) !important;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand), transparent 70%) !important;
+}
+
+/* Professional card shadows on hover - theme aware */
 .theme-card:hover {
-	box-shadow: 0 12px 40px rgba(2, 6, 23, 0.08) !important;
 	transform: translateY(-1px);
 	transition: all 0.3s ease;
+}
+
+/* Light theme shadows */
+html[data-theme="light"] .theme-card:hover,
+html[data-theme="sunset"] .theme-card:hover,
+html[data-theme="desert"] .theme-card:hover,
+html[data-theme="ocean"] .theme-card:hover,
+html[data-theme="lavender"] .theme-card:hover,
+html[data-theme="solarized"] .theme-card:hover {
+	box-shadow: 0 12px 40px rgba(2, 6, 23, 0.08) !important;
+}
+
+/* Dark theme shadows - darker */
+html[data-theme="dark"] .theme-card:hover {
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Override all shadow utilities for dark theme */
+html[data-theme="dark"] .shadow,
+html[data-theme="dark"] .shadow-sm,
+html[data-theme="dark"] .shadow-md,
+html[data-theme="dark"] .shadow-lg,
+html[data-theme="dark"] .shadow-xl,
+html[data-theme="dark"] .shadow-2xl {
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Light themes keep normal shadows */
+html[data-theme="light"] .shadow-lg,
+html[data-theme="sunset"] .shadow-lg,
+html[data-theme="desert"] .shadow-lg,
+html[data-theme="ocean"] .shadow-lg,
+html[data-theme="lavender"] .shadow-lg,
+html[data-theme="solarized"] .shadow-lg {
+	box-shadow: 0 10px 30px rgba(2, 6, 23, 0.1), 0 2px 8px rgba(2, 6, 23, 0.06) !important;
 }
 
 /* Gradient text effect for headings */

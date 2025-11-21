@@ -18,6 +18,204 @@ let lastProbeRes = null;
 let updateInfo = null;
 let currentMaxConcurrent = 3;
 
+// Helper function to validate YouTube URL
+function isValidYouTubeUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    
+    // Check if it's a valid URL format
+    try {
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname.toLowerCase();
+        const pathname = urlObj.pathname;
+        const searchParams = urlObj.searchParams;
+        
+        // Valid YouTube domains
+        const validDomains = [
+            'youtube.com',
+            'www.youtube.com',
+            'm.youtube.com',
+            'youtu.be',
+            'music.youtube.com'
+        ];
+        
+        // Check if domain is valid
+        const isValidDomain = validDomains.some(domain => hostname === domain || hostname.endsWith('.' + domain));
+        if (!isValidDomain) return false;
+        
+        // For youtu.be short links, path should not be empty or just "/"
+        if (hostname === 'youtu.be') {
+            return pathname && pathname.length > 1 && pathname !== '/';
+        }
+        
+        // For youtube.com domains, check for valid video/playlist patterns
+        // Valid patterns:
+        // - /watch?v=VIDEO_ID (regular videos)
+        // - /playlist?list=PLAYLIST_ID (playlists)
+        // - /shorts/VIDEO_ID (shorts)
+        // - /live/VIDEO_ID (live streams)
+        // - /embed/VIDEO_ID (embedded videos)
+        
+        if (pathname.includes('/watch') && searchParams.has('v')) {
+            return true; // Video URL
+        }
+        
+        if (pathname.includes('/playlist') && searchParams.has('list')) {
+            return true; // Playlist URL
+        }
+        
+        if (pathname.startsWith('/shorts/') && pathname.length > 8) {
+            return true; // Shorts URL
+        }
+        
+        if (pathname.startsWith('/live/') && pathname.length > 6) {
+            return true; // Live stream URL
+        }
+        
+        if (pathname.startsWith('/embed/') && pathname.length > 7) {
+            return true; // Embedded video URL
+        }
+        
+        // Check for "list" parameter (playlists can be in various formats)
+        if (searchParams.has('list')) {
+            return true;
+        }
+        
+        return false; // Not a valid video/playlist URL
+    } catch (e) {
+        return false;
+    }
+}
+
+// Reusable dialog modal functions
+function showAlertDialog(title, message, buttonText = 'OK') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm';
+        overlay.style.animation = 'fadeIn 0.2s ease';
+        
+        const dialog = document.createElement('div');
+        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform';
+        dialog.style.animation = 'slideUp 0.3s ease';
+        
+        dialog.innerHTML = `
+            <div class="flex items-start gap-4 mb-4">
+                <div class="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">${title}</h3>
+                    <p class="text-sm text-slate-600">${message}</p>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button id="dialog-ok" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all transform hover:scale-105 active:scale-95">
+                    ${buttonText}
+                </button>
+            </div>
+        `;
+        
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        `;
+        document.head.appendChild(style);
+        
+        const okBtn = dialog.querySelector('#dialog-ok');
+        
+        const cleanup = () => {
+            overlay.style.animation = 'fadeOut 0.2s ease';
+            setTimeout(() => {
+                overlay.remove();
+                style.remove();
+            }, 200);
+        };
+        
+        okBtn.onclick = () => {
+            cleanup();
+            resolve();
+        };
+        
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve();
+            }
+        };
+    });
+}
+
+// Error dialog for invalid URLs
+function showErrorDialog(title, message, buttonText = 'OK') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm';
+        overlay.style.animation = 'fadeIn 0.2s ease';
+        
+        const dialog = document.createElement('div');
+        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform';
+        dialog.style.animation = 'slideUp 0.3s ease';
+        
+        dialog.innerHTML = `
+            <div class="flex items-start gap-4 mb-4">
+                <div class="p-3 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">${title}</h3>
+                    <p class="text-sm text-slate-600">${message}</p>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6">
+                <button id="dialog-ok" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold hover:from-red-700 hover:to-rose-700 shadow-lg shadow-red-200 transition-all transform hover:scale-105 active:scale-95">
+                    ${buttonText}
+                </button>
+            </div>
+        `;
+        
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        `;
+        document.head.appendChild(style);
+        
+        const okBtn = dialog.querySelector('#dialog-ok');
+        
+        const cleanup = () => {
+            overlay.style.animation = 'fadeOut 0.2s ease';
+            setTimeout(() => {
+                overlay.remove();
+                style.remove();
+            }, 200);
+        };
+        
+        okBtn.onclick = () => {
+            cleanup();
+            resolve();
+        };
+        
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                cleanup();
+                resolve();
+            }
+        };
+    });
+}
+
 async function init() {
     setupQuality();
     setDownloadEnabled(false);
@@ -115,14 +313,14 @@ function setupQuality(){
         const url = urlInput.value.trim();
         if (!/^https?:\/\//i.test(url)) { applyDefault(); return; }
         const currentFmt = document.querySelector('input[name="format"]:checked')?.value || 'mp4';
-        
+
         // Check if download was previously enabled
         const wasDownloadEnabled = downloadBtn && !downloadBtn.classList.contains('disabled-btn');
-        
+
         // Disable quality and download button while loading
         if (qualitySel) qualitySel.disabled = true;
         if (downloadBtn) downloadBtn.classList.add('disabled-btn');
-        
+
         await new Promise(r => setTimeout(r, 0));
         try {
             const res = await getProbe(url);
@@ -141,7 +339,14 @@ function setupQuality(){
     // events
     urlInput.addEventListener('change', repopulateFromProbe);
     urlInput.addEventListener('blur', repopulateFromProbe);
-    urlInput.addEventListener('input', () => setDownloadEnabled(false));
+    urlInput.addEventListener('input', () => {
+        // Disable download when URL changes - user must fetch again
+        setDownloadEnabled(false);
+        // Clear fetch result when URL changes
+        if (fetchResult) fetchResult.textContent = '';
+        if (rangeWrap) rangeWrap.classList.add('hidden');
+        if (concurrentInfo) concurrentInfo.classList.add('hidden');
+    });
     const formatRadios = Array.from(document.querySelectorAll('input[name="format"]'));
     formatRadios.forEach(r => {
         r.addEventListener('change', repopulateFromProbe);
@@ -155,12 +360,27 @@ function setupQuality(){
     applyDefault();
 }
 
+// Helper function to check and enable download button
+function checkAndEnableDownload() {
+    const url = urlInput.value.trim();
+    if (url && isValidYouTubeUrl(url)) {
+        setDownloadEnabled(true);
+    } else {
+        setDownloadEnabled(false);
+    }
+}
+
 downloadBtn.addEventListener('click', async () => {
-	const url = urlInput.value.trim();
-	if (!url) {
-		alert('Please paste a YouTube video or playlist URL.');
-		return;
-	}
+    const url = urlInput.value.trim();
+    if (!url) {
+        await showAlertDialog('URL Required', 'Please paste a YouTube video or playlist URL.', 'OK');
+        return;
+    }
+    // Validate YouTube URL
+    if (!isValidYouTubeUrl(url)) {
+        await showErrorDialog('Invalid URL', 'Please enter a valid YouTube URL. Make sure it\'s from youtube.com or youtu.be', 'OK');
+        return;
+    }
     const fmt = document.querySelector('input[name="format"]:checked').value;
     const q = qualitySel ? (qualitySel.value || 'Auto') : 'Auto';
     const quality = fmt === 'mp4' ? (q === 'Auto' ? undefined : q) : undefined;
@@ -178,10 +398,25 @@ downloadBtn.addEventListener('click', async () => {
 
 if (fetchBtn) fetchBtn.addEventListener('click', async () => {
     const url = urlInput.value.trim();
-    if (!url) { alert('Enter a URL first.'); return; }
+    if (!url) { await showAlertDialog('URL Required', 'Please enter a YouTube URL first.', 'OK'); return; }
     
-    // Store original button content
+    // Validate YouTube URL
+    if (!isValidYouTubeUrl(url)) {
+        await showErrorDialog('Invalid URL', 'Please enter a valid YouTube URL. Make sure it\'s from youtube.com or youtu.be', 'OK');
+        return;
+    }
+    
+    // Disable button to prevent double-clicks
+    if (fetchBtn.disabled) return;
+    
+    // Store original button content before any changes
     const originalHTML = fetchBtn.innerHTML;
+    
+    // Helper to restore button state
+    const restoreButton = () => {
+        fetchBtn.disabled = false;
+        fetchBtn.innerHTML = originalHTML;
+    };
     
     try {
         fetchBtn.disabled = true;
@@ -192,7 +427,9 @@ if (fetchBtn) fetchBtn.addEventListener('click', async () => {
             </svg>
             <span>Fetching...</span>
         `;
+        
         const info = await window.downTube.fetchInfo(url);
+        
         if (info?.ok) {
             if (info.type === 'playlist') {
                 fetchResult.textContent = `${info.count} videos found in playlist${info.title ? `: ${info.title}` : ''}`;
@@ -226,26 +463,28 @@ if (fetchBtn) fetchBtn.addEventListener('click', async () => {
             if (concurrentInfo) concurrentInfo.classList.add('hidden');
             setDownloadEnabled(false);
         }
-        // Also refresh quality options based on this URL
-        try {
-            const res = await (async () => {
-                try { return await getProbe(url); } catch { return null; }
-            })();
-            const fmt = document.querySelector('input[name="format"]:checked')?.value || 'mp4';
-            populateQuality(fmt, res?.ok ? res : null);
-        } catch (error) {
-            console.error('Error during fetch:', error);
-        }
+        
+        // Restore button immediately after main fetch completes
+        restoreButton();
+        
+        // Refresh quality options in background (don't block button restoration)
+        (async () => {
+            try {
+                const res = await getProbe(url);
+                const fmt = document.querySelector('input[name="format"]:checked')?.value || 'mp4';
+                populateQuality(fmt, res?.ok ? res : null);
+            } catch (error) {
+                console.error('Error probing formats:', error);
+            }
+        })();
+        
     } catch (error) {
         console.error('Fetch error:', error);
         fetchResult.textContent = 'Failed to fetch video information';
         if (rangeWrap) rangeWrap.classList.add('hidden');
         if (concurrentInfo) concurrentInfo.classList.add('hidden');
         setDownloadEnabled(false);
-    } finally {
-        fetchBtn.disabled = false;
-        // Restore original button content
-        fetchBtn.innerHTML = originalHTML;
+        restoreButton();
     }
 });
 

@@ -6,7 +6,7 @@ async function refreshDownloads() {
 	
 	if (items.length === 0) {
 		list.innerHTML = `
-			<div class="text-center py-8 text-slate-400">
+			<div class="text-center py-8" style="color: var(--muted)">
 				<svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
 				</svg>
@@ -19,14 +19,14 @@ async function refreshDownloads() {
 	
     for (const d of items) {
 		const card = document.createElement('div');
-		card.className = 'bg-white border-2 border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all';
+		card.className = 'bg-white border-2 border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all theme-card';
 		const pct = Math.max(0, Math.min(100, Math.round(d.percent || 0)));
 		const title = String(d.title || d.url || '').replace(/[&<>]/g, s => ({'&': '&amp;','<': '&lt;','>': '&gt;'}[s]));
         card.innerHTML = `
 			<div class="flex items-start justify-between gap-3 mb-3">
                 <div class="flex-1 min-w-0">
 					<h3 class="font-bold text-slate-800 text-sm line-clamp-1 mb-1" title="${title}">${title}</h3>
-					<div class="flex items-center gap-3 text-xs text-slate-500">
+					<div class="flex items-center gap-3 text-xs" style="color: var(--muted)">
 						${d.indeterminate ? '<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>Converting...</span>' : `
 						<span class="flex items-center gap-1">
 							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,15 +50,15 @@ async function refreshDownloads() {
 					</div>
 				</div>
                 <div class="flex items-center gap-3">
-                    <button class="dt-cancel p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Cancel Download" data-id="${d.id}">
+                    <button class="dt-cancel p-2 rounded-lg hover:bg-red-50 transition-all" style="color: var(--muted)" title="Cancel Download" data-id="${d.id}">
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 						</svg>
 					</button>
-                    <span class="text-sm font-bold ${d.indeterminate ? 'text-blue-600' : 'text-slate-800'} min-w-[3rem] text-right">${d.indeterminate ? '...' : pct + '%'}</span>
+                    <span class="text-sm font-bold ${d.indeterminate ? 'text-slate-800' : 'text-slate-800'} min-w-[3rem] text-right" style="color: ${d.indeterminate ? 'var(--brand)' : 'var(--text)'}">${d.indeterminate ? '...' : pct + '%'}</span>
                 </div>
 			</div>
-            <div class="h-3 bg-gradient-to-r from-slate-100 to-slate-50 rounded-full overflow-hidden border border-slate-200">
+            <div class="h-3 rounded-full overflow-hidden border border-slate-200" style="background-color: var(--border)">
                 <div class="h-full download-bar ${d.indeterminate ? 'animate-pulse' : ''}" style="width:${d.indeterminate ? '100%' : pct + '%'}"></div>
 			</div>
 		`;
@@ -83,7 +83,7 @@ async function refreshHistory() {
 	
 	if (items.length === 0) {
 		list.innerHTML = `
-			<div class="text-center py-12 text-slate-400">
+			<div class="text-center py-12" style="color: var(--muted)">
 				<svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
 				</svg>
@@ -96,13 +96,13 @@ async function refreshHistory() {
 	
 	for (const h of [...items].reverse().slice(0, 100)) {
 		const card = document.createElement('div');
-		card.className = 'group bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-lg p-3 hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-default';
+		card.className = 'group bg-white border border-slate-200 rounded-lg p-3 hover:shadow-md transition-all duration-200 cursor-default theme-card';
 		
 		const when = new Date(h.completedAt).toLocaleString();
 		const formatUpper = h.format?.toUpperCase?.() || 'FILE';
 		const formatColor = formatUpper === 'MP4' ? 'bg-blue-100 text-blue-700 border-blue-200' : 
 		                   formatUpper === 'MP3' ? 'bg-purple-100 text-purple-700 border-purple-200' : 
-		                   'bg-gray-100 text-gray-700 border-gray-200';
+		                   'bg-slate-100 text-slate-700 border-slate-200';
 		
 		const icon = formatUpper === 'MP4' ? 
 			`<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6.47L5.76 10H20v8H4V6.47M22 4h-4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4z"/></svg>` :
@@ -115,14 +115,14 @@ async function refreshHistory() {
 				</div>
 				<div class="flex-1 min-w-0">
 					<div class="flex items-start justify-between gap-2">
-						<h3 class="font-semibold text-slate-800 text-sm line-clamp-1 group-hover:text-sky-600 transition-colors" title="${escapeHtml(h.title)}">
+						<h3 class="font-semibold text-slate-800 text-sm line-clamp-1 group-hover:text-sky-600 transition-colors" title="${escapeHtml(h.title)}" style="color: var(--text)">
 							${escapeHtml(h.title)}
 						</h3>
 						<span class="text-xs font-medium ${formatColor} px-2 py-0.5 rounded-full border flex-shrink-0">
 							${formatUpper}
 						</span>
 					</div>
-					<div class="flex items-center gap-3 mt-1.5 text-xs text-slate-500">
+					<div class="flex items-center gap-3 mt-1.5 text-xs" style="color: var(--muted)">
 						<span class="flex items-center gap-1">
 							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -184,26 +184,26 @@ function showConfirmDialog(title, message, confirmText, cancelText) {
         
         // Create dialog
         const dialog = document.createElement('div');
-        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform';
+        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform theme-card';
         dialog.style.animation = 'slideUp 0.3s ease';
         
         dialog.innerHTML = `
             <div class="flex items-start gap-4 mb-4">
-                <div class="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg">
+                <div class="p-3 rounded-xl shadow-lg" style="background: linear-gradient(to bottom right, var(--accent), var(--brand))">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-lg font-bold text-slate-900 mb-1">${title}</h3>
-                    <p class="text-sm text-slate-600">${message}</p>
+                    <h3 class="text-lg font-bold text-slate-900 mb-1" style="color: var(--text)">${title}</h3>
+                    <p class="text-sm text-slate-600" style="color: var(--muted)">${message}</p>
                 </div>
             </div>
             <div class="flex gap-3 mt-6">
-                <button id="dialog-cancel" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-all">
+                <button id="dialog-cancel" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 font-semibold hover:bg-slate-50 transition-all" style="color: var(--text); border-color: var(--border)">
                     ${cancelText}
                 </button>
-                <button id="dialog-confirm" class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 text-white font-bold hover:from-red-700 hover:to-red-800 shadow-lg shadow-red-200 transition-all transform hover:scale-105 active:scale-95">
+                <button id="dialog-confirm" class="flex-1 px-4 py-2.5 rounded-xl text-white font-bold shadow-lg transition-all transform hover:scale-105 active:scale-95" style="background: linear-gradient(to right, var(--accent), var(--accent)); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent), transparent 70%)">
                     ${confirmText}
                 </button>
             </div>
@@ -263,7 +263,7 @@ function showDownloadCompleteDialog(data) {
         
         // Create dialog
         const dialog = document.createElement('div');
-        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform';
+        dialog.className = 'bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4 transform theme-card';
         dialog.style.animation = 'slideUp 0.3s ease';
         
         const successIcon = `
@@ -274,33 +274,33 @@ function showDownloadCompleteDialog(data) {
         
         dialog.innerHTML = `
             <div class="flex items-start gap-4 mb-4">
-                <div class="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg shadow-green-200">
+                <div class="p-3 rounded-xl shadow-lg" style="background: linear-gradient(to bottom right, var(--brand), var(--accent)); box-shadow: 0 8px 20px color-mix(in srgb, var(--brand), transparent 70%)">
                     ${successIcon}
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-lg font-bold text-slate-900 mb-1">Downloads Complete!</h3>
-                    <p class="text-sm text-slate-600 mb-3">Your downloads have finished successfully.</p>
-                    <div class="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-lg p-3 space-y-2 text-xs">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1" style="color: var(--text)">Downloads Complete!</h3>
+                    <p class="text-sm text-slate-600 mb-3" style="color: var(--muted)">Your downloads have finished successfully.</p>
+                    <div class="bg-white border border-slate-200 rounded-lg p-3 space-y-2 text-xs">
                         <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 flex-shrink-0" style="color: var(--brand)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span class="text-slate-700"><strong>${completed}</strong> of <strong>${total}</strong> item(s) completed</span>
+                            <span style="color: var(--text)"><strong>${completed}</strong> of <strong>${total}</strong> item(s) completed</span>
                         </div>
                         <div class="flex items-start gap-2">
-                            <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" style="color: var(--brand)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                             </svg>
-                            <span class="text-slate-600 break-all" title="${outDir}">${outDir}</span>
+                            <span class="break-all" style="color: var(--muted)" title="${outDir}">${outDir}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="flex gap-3 mt-6">
-                <button id="dialog-ok" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-all">
+                <button id="dialog-ok" class="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-200 font-semibold hover:bg-slate-50 transition-all" style="color: var(--text); border-color: var(--border)">
                     Close
                 </button>
-                <button id="dialog-open-folder" class="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                <button id="dialog-open-folder" class="flex-1 px-4 py-2.5 rounded-xl text-white font-bold shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2" style="background: linear-gradient(to right, var(--brand), var(--accent)); box-shadow: 0 8px 20px color-mix(in srgb, var(--brand), transparent 70%)">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path>
                     </svg>
