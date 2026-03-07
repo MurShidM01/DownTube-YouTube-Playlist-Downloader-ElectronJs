@@ -1,19 +1,20 @@
 {
-  "name": "DownTube",
-  "version": "1.0.2",
+  "name": "downtube",
+  "version": "1.0.3",
   "description": "A Youtube Videos and Playlist Downloader Application",
-  "main": "index.js",
+  "main": "./electron/main/index.js",
   "author": "Ali Khan Jalbani",
   "license": "ISC",
   "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "start": "electron .",
-    "dev": "electron .",
-    "build": "electron-builder"
+    "build": "vite build && electron-builder",
+    "preview": "vite preview"
   },
   "build": {
     "appId": "com.ali.downtube",
     "productName": "DownTube",
-    "copyright": "Copyright © 2025 Ali Khan",
+    "copyright": "Copyright (c) 2025 Ali Khan",
     "compression": "maximum",
     "win": {
       "target": [
@@ -25,27 +26,30 @@
           ]
         }
       ],
-      "icon": "renderer/icon.ico"
+      "icon": "public/assets/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "public/assets"
     },
     "directories": {
       "output": "dist"
     },
     "files": [
-      "**/*",
-      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
-      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
-      "!*.map",
-      "!yt-dlp.exe",
-      "!ffmpeg.exe",
-      "!dist/**/*"
+      "dist/**",
+      "electron/**",
+      "package.json"
     ],
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowElevation": false,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "renderer/icon.ico",
-      "uninstallerIcon": "renderer/icon.ico",
+      "installerIcon": "public/assets/icon.ico",
+      "uninstallerIcon": "public/assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "DownTube",
@@ -55,10 +59,20 @@
     }
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "electron": "^37.2.6",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.3",
+    "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "sanitize-filename": "^1.6.3"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0"
   }
 }

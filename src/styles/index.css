@@ -1,0 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #f7f2f3;
+    --bg-strong: #f3e7e9;
+    --surface: #ffffff;
+    --surface-soft: #f9f5f6;
+    --border: #ead9de;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --brand: #e25563;
+    --brand-strong: #d13b4b;
+    --accent: #42b883;
+    --accent-strong: #2fa26f;
+    --shadow: none;
+    --titlebar-height: 64px;
+  }
+
+  [data-theme='dark'] {
+    --bg: #0f1115;
+    --bg-strong: #161a22;
+    --surface: #151b26;
+    --surface-soft: #1c2433;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f1f5f9;
+    --muted: #9aa4b2;
+    --brand: #ff7b86;
+    --brand-strong: #f05466;
+    --accent: #4ad295;
+    --accent-strong: #2fb57a;
+    --shadow: none;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Ubuntu', system-ui, sans-serif;
+    color: var(--text);
+    background: transparent;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(226, 85, 99, 0.6) var(--surface-soft);
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--surface-soft);
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(226, 85, 99, 0.9), rgba(66, 184, 131, 0.85));
+    border-radius: 999px;
+    border: 2px solid var(--surface-soft);
+  }
+
+  [data-theme='dark'] * {
+    scrollbar-color: rgba(255, 123, 134, 0.7) var(--surface-soft);
+  }
+}
+
+@layer components {
+  .app-shell {
+    min-height: 100%;
+    background: var(--bg);
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  .app-content {
+    height: calc(100vh - var(--titlebar-height));
+    overflow-y: auto;
+  }
+
+  .titlebar {
+    -webkit-app-region: drag;
+    height: var(--titlebar-height);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .titlebar button, .no-drag {
+    -webkit-app-region: no-drag;
+  }
+
+  .dt-card {
+    @apply rounded-3xl border;
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .dt-card-soft {
+    @apply rounded-2xl border;
+    background: var(--surface-soft);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .dt-pill {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold;
+    background: rgba(226, 85, 99, 0.12);
+    color: var(--brand-strong);
+    border: 1px solid rgba(226, 85, 99, 0.25);
+  }
+
+  .dt-label {
+    @apply text-[11px] uppercase tracking-[0.35em] font-semibold;
+    color: var(--muted);
+  }
+
+  .dt-input {
+    @apply w-full rounded-2xl px-4 py-3 text-sm outline-none transition;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .dt-input:focus {
+    box-shadow: 0 0 0 3px rgba(226, 85, 99, 0.2);
+    border-color: rgba(226, 85, 99, 0.45);
+  }
+
+  .dt-select-field {
+    @apply relative;
+  }
+
+  .dt-select-trigger {
+    @apply mt-2 w-full rounded-2xl px-4 py-3 text-sm outline-none transition flex items-center justify-between gap-3;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .dt-select-trigger:focus {
+    box-shadow: 0 0 0 3px rgba(226, 85, 99, 0.2);
+    border-color: rgba(226, 85, 99, 0.45);
+  }
+
+  .dt-select-caret {
+    @apply text-slate-400 transition;
+  }
+
+  .dt-select-caret.open {
+    transform: rotate(180deg);
+  }
+
+  .dt-select-menu {
+    @apply absolute left-0 right-0 mt-2 rounded-2xl border z-30;
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .dt-select-scroll {
+    @apply max-h-56 overflow-auto p-2;
+  }
+
+  .dt-select-item {
+    @apply w-full text-left px-3 py-2 rounded-xl text-sm font-medium transition flex items-center justify-between;
+    color: var(--text);
+  }
+
+  .dt-select-item:hover {
+    background: rgba(226, 85, 99, 0.12);
+  }
+
+  .dt-select-item.active {
+    background: linear-gradient(135deg, rgba(226, 85, 99, 0.18), rgba(66, 184, 131, 0.18));
+  }
+
+  .dt-select-check {
+    @apply text-xs font-semibold;
+    color: var(--brand-strong);
+  }
+
+  .dt-select {
+    @apply w-full rounded-2xl px-4 py-3 text-sm outline-none transition;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .dt-select:focus {
+    box-shadow: 0 0 0 3px rgba(226, 85, 99, 0.2);
+    border-color: rgba(226, 85, 99, 0.45);
+  }
+
+  .dt-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition;
+  }
+
+  .dt-button-primary {
+    background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+    color: white;
+  }
+
+  .dt-button-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .dt-button-accent {
+    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    color: white;
+  }
+
+  .dt-button-muted {
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .dt-segment {
+    @apply grid grid-cols-2 gap-2 rounded-2xl p-2;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+  }
+
+  .dt-segment-btn {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold transition;
+    color: var(--muted);
+  }
+
+  .dt-segment-btn.active {
+    background: linear-gradient(135deg, rgba(226, 85, 99, 0.22), rgba(66, 184, 131, 0.18));
+    color: var(--text);
+  }
+
+  .dt-toggle {
+    @apply relative inline-flex items-center w-12 h-7 rounded-full transition;
+    background: rgba(148, 163, 184, 0.4);
+  }
+
+  .dt-toggle.active {
+    background: linear-gradient(135deg, var(--brand), var(--accent));
+  }
+
+  .dt-toggle-dot {
+    @apply absolute left-1 top-1 w-5 h-5 rounded-full bg-white shadow transition;
+  }
+
+  .dt-toggle.active .dt-toggle-dot {
+    transform: translateX(20px);
+  }
+
+  .dt-progress-track {
+    background: rgba(226, 85, 99, 0.14);
+  }
+
+  .dt-progress-bar {
+    background: linear-gradient(90deg, var(--brand), var(--accent));
+  }
+
+  @keyframes dtProgressMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+
+  .dt-progress-indeterminate {
+    width: 100%;
+    background: linear-gradient(90deg, rgba(226, 85, 99, 0.7), rgba(66, 184, 131, 0.6), rgba(226, 85, 99, 0.7));
+    background-size: 200% 100%;
+    animation: dtProgressMove 1.2s linear infinite;
+  }
+
+  .dt-muted {
+    color: var(--muted);
+  }
+
+  .dt-badge {
+    @apply rounded-full px-3 py-1 text-xs font-semibold;
+    background: rgba(226, 85, 99, 0.12);
+    color: var(--brand-strong);
+    border: 1px solid rgba(226, 85, 99, 0.22);
+  }
+
+  .dt-bottom-nav {
+    @apply fixed bottom-5 left-1/2 -translate-x-1/2;
+  }
+
+  .dt-bottom-nav-card {
+    @apply flex items-center gap-2 rounded-2xl px-2 py-2;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .dt-bottom-item {
+    @apply px-4 py-2 rounded-xl text-sm font-semibold transition;
+    color: var(--muted);
+  }
+
+  .dt-bottom-item.active {
+    background: linear-gradient(135deg, rgba(226, 85, 99, 0.18), rgba(66, 184, 131, 0.18));
+    color: var(--text);
+  }
+}

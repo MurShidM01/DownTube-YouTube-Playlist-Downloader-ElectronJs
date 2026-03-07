@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data:; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com">
+	<title>DownTube</title>
+	<style>
+		html,body{height:100%;margin:0;overflow:hidden;background:transparent}
+		body{display:flex;align-items:center;justify-content:center;font-family:var(--app-font, Inter),system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#0f172a;padding:30px;box-sizing:border-box}
+		.card{background:rgba(255,255,255,0.98);backdrop-filter:blur(20px);border-radius:20px;padding:24px 28px;box-shadow:0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.5) inset;width:100%;max-width:100%;border:2px solid rgba(255,255,255,0.2);transition:all 0.3s ease;box-sizing:border-box;position:relative}
+		.header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+		.logo-container{padding:10px;background:linear-gradient(135deg, #e11d48, #be123c);border-radius:14px;box-shadow:0 6px 16px rgba(225,29,72,0.4);flex-shrink:0}
+		.logo{width:28px;height:28px;color:#fff}
+		.title{font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-0.5px}
+		.subtitle{font-size:10px;color:#94a3b8;font-weight:600;margin-top:2px}
+		.dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg, #3b82f6, #2563eb);animation:pulse 1.2s infinite alternate;box-shadow:0 0 10px rgba(59,130,246,0.6);flex-shrink:0}
+		@keyframes pulse{to{transform:scale(1.4);opacity:.5}}
+		
+		.progress-section{margin-top:16px;display:none}
+		.progress-section.active{display:block}
+		.status-text{font-size:12px;color:#64748b;margin-bottom:8px;font-weight:600;text-align:center}
+		.status-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:700;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+		.status-chip.offline{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+		.status-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+		.retry-inline{display:none;padding:6px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:10px;font-weight:700;color:#0f172a;cursor:pointer}
+		.retry-inline:hover{background:#f8fafc}
+		.progress-bar-container{height:7px;background:linear-gradient(to right, #f1f5f9, #e2e8f0);border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);position:relative}
+		.progress-bar{height:100%;background:linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);transition:width 0.4s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 0 8px rgba(59,130,246,0.4);position:relative}
+		.progress-bar::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);animation:shimmer 2s infinite}
+		@keyframes shimmer{to{transform:translateX(100%)}}
+		.progress-details{font-size:10px;color:#94a3b8;margin-top:5px;display:flex;justify-content:space-between;font-weight:600}
+		.download-item{margin-bottom:10px;padding:10px 12px;background:linear-gradient(to right, #faf9fb, #ffffff);border-radius:10px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+		.download-item:last-child{margin-bottom:0}
+		.item-name{font-weight:700;color:#1e293b;font-size:11px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+		.item-name::before{content:'';width:5px;height:5px;background:linear-gradient(135deg, #10b981, #059669);border-radius:50%;box-shadow:0 0 5px rgba(16,185,129,0.5);animation:pulse 1s infinite alternate}
+		.version-badge{display:inline-block;margin-top:14px;padding:4px 8px;background:linear-gradient(135deg, #f1f5f9, #e2e8f0);border-radius:6px;font-size:9px;font-weight:600;color:#64748b;text-align:center;width:100%}
+		.path-badge{display:block;margin-top:6px;padding:4px 8px;background:#f8fafc;border-radius:6px;font-size:9px;font-weight:600;color:#94a3b8;text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+		.modal-backdrop{position:absolute;inset:0;background:rgba(15,23,42,0.42);display:none;align-items:center;justify-content:center;border-radius:20px}
+		.modal-backdrop.active{display:flex}
+		.modal-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 10px 30px rgba(15,23,42,0.3);width:100%;max-width:320px;border:1px solid #e2e8f0;text-align:center}
+		.modal-title{font-size:14px;font-weight:800;color:#0f172a}
+		.modal-text{font-size:11px;color:#64748b;margin-top:6px}
+		.modal-actions{margin-top:12px;display:flex;justify-content:center}
+		.modal-btn{padding:8px 12px;border-radius:10px;border:1px solid #e2e8f0;background:linear-gradient(135deg, #3b82f6, #2563eb);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
+		.modal-btn:hover{filter:brightness(1.05)}
+		
+		@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+		@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+	</style>
+</head>
+<body>
+	<div class="card">
+		<div class="header">
+			<div class="logo-container">
+				<svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.22v7.56c0 1.96-2.12 3.19-3.82 2.11l-5.2-3.35a2.49 2.49 0 0 1 0-4.06l5.2-3.35C19.88 5.04 22 6.27 22 8.22z"/><path d="M2 8v8"/><path d="M6 4v16"/></svg>
+			</div>
+			<div style="flex:1;min-width:0">
+				<div class="title">DownTube</div>
+				<div class="subtitle">YouTube Downloader</div>
+			</div>
+			<div class="dot" id="loading-dot"></div>
+		</div>
+		
+		<div class="status-row">
+			<span class="status-chip" id="status-chip">Checking connection</span>
+			<button class="retry-inline" id="retry-inline">Retry</button>
+		</div>
+		<div class="status-text" id="status-text">Initializing application...</div>
+		
+		<div class="progress-section" id="progress-section">
+			<div id="download-items"></div>
+		</div>
+		
+		<div class="version-badge">Version 1.0.3</div>
+		<div class="path-badge" id="deps-path">Dependencies: -</div>
+		<div class="modal-backdrop" id="offline-modal">
+			<div class="modal-card">
+				<div class="modal-title" id="offline-modal-title">Offline mode</div>
+				<div class="modal-text" id="offline-modal-text">
+					You are offline and FFmpeg is not available. Connect to the internet to download FFmpeg.
+				</div>
+				<div class="modal-actions">
+					<button class="modal-btn" id="offline-retry">Retry (Restart)</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		const { ipcRenderer } = require('electron');
+		
+		const progressSection = document.getElementById('progress-section');
+		const downloadItems = document.getElementById('download-items');
+		const statusText = document.getElementById('status-text');
+		const loadingDot = document.getElementById('loading-dot');
+		const statusChip = document.getElementById('status-chip');
+		const retryInline = document.getElementById('retry-inline');
+		const offlineModal = document.getElementById('offline-modal');
+		const offlineModalTitle = document.getElementById('offline-modal-title');
+		const offlineModalText = document.getElementById('offline-modal-text');
+		const offlineRetry = document.getElementById('offline-retry');
+		
+		const downloadStates = new Map();
+		
+		function showOfflineState() {
+			loadingDot.style.display = 'none';
+			statusChip.textContent = 'Offline';
+			statusChip.classList.add('offline');
+			retryInline.style.display = 'inline-flex';
+			statusText.textContent = 'No internet connection detected. Waiting for connection...';
+			statusText.style.color = '#b91c1c';
+		}
+		
+		function showOnlineState() {
+			loadingDot.style.display = 'block';
+			statusChip.textContent = 'Online';
+			statusChip.classList.remove('offline');
+			retryInline.style.display = 'none';
+			statusText.textContent = 'Checking internet connection...';
+			statusText.style.color = '#64748b';
+		}
+
+		function showOfflineBlock(title, message) {
+			if (offlineModalTitle && title) offlineModalTitle.textContent = title;
+			if (offlineModalText && message) offlineModalText.textContent = message;
+			offlineModal.classList.add('active');
+		}
+
+		function hideOfflineBlock() {
+			offlineModal.classList.remove('active');
+		}
+		
+		retryInline.addEventListener('click', () => {
+			showOnlineState();
+			ipcRenderer.send('retry-connection');
+		});
+
+		offlineRetry.addEventListener('click', () => {
+			hideOfflineBlock();
+			showOnlineState();
+			ipcRenderer.send('retry-connection');
+		});
+		
+		// Listen for no internet event from main process
+		ipcRenderer.on('no-internet', () => {
+			showOfflineState();
+		});
+
+		ipcRenderer.on('offline-block', (_event, payload) => {
+			showOfflineBlock(payload?.title || 'Offline mode', payload?.message || '');
+		});
+		
+		// Apply font setting
+		function applyFont(fontFamily) {
+			try {
+				// Map font names to actual font families
+				const fontMap = {
+					'Poppins': "'Poppins', sans-serif",
+					'Ubuntu': "'Ubuntu', sans-serif",
+					'Geist Mono': "'Geist Mono', monospace",
+					'Inter': "'Inter', sans-serif",
+					'System': "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+				};
+				
+				const fontValue = fontMap[fontFamily] || fontMap['Inter'];
+				document.documentElement.style.setProperty('--app-font', fontValue);
+				
+				// Load Google Fonts if needed
+				if (fontFamily !== 'System' && !document.getElementById('google-fonts-link')) {
+					const link = document.createElement('link');
+					link.id = 'google-fonts-link';
+					link.rel = 'stylesheet';
+					link.href = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(' ', '+')}:wght@400;500;600;700&display=swap`;
+					document.head.appendChild(link);
+				}
+			} catch (error) {
+				console.error('[Splash] Error applying font:', error);
+			}
+		}
+		
+		// Listen for font setting from main process
+		ipcRenderer.on('apply-font', (event, fontFamily) => {
+			applyFont(fontFamily);
+		});
+		
+		// Listen for dependency download progress
+		ipcRenderer.on('dependency-download-progress', (event, progress) => {
+			const { name, progress: percent, downloadedMB, totalMB } = progress;
+			
+			// Show progress section
+			progressSection.classList.add('active');
+			loadingDot.style.display = 'none';
+			statusText.textContent = 'Setting up required components...';
+			statusChip.textContent = 'Setting up';
+			
+			// Update or create download item
+			if (!downloadStates.has(name)) {
+				const itemDiv = document.createElement('div');
+				itemDiv.className = 'download-item';
+				itemDiv.id = `download-${name}`;
+				itemDiv.innerHTML = `
+					<div class="item-name">${name === 'yt-dlp' ? 'Video Engine Setup' : 'Media Processor Setup'}</div>
+					<div class="progress-bar-container">
+						<div class="progress-bar" id="bar-${name}"></div>
+					</div>
+					<div class="progress-details">
+						<span id="percent-${name}">0%</span>
+						<span id="size-${name}">0 / 0 MB</span>
+					</div>
+				`;
+				downloadItems.appendChild(itemDiv);
+				downloadStates.set(name, itemDiv);
+			}
+			
+			// Update progress
+			const bar = document.getElementById(`bar-${name}`);
+			const percentEl = document.getElementById(`percent-${name}`);
+			const sizeEl = document.getElementById(`size-${name}`);
+			
+			if (bar) bar.style.width = `${percent}%`;
+			if (percentEl) percentEl.textContent = `${percent}%`;
+			if (sizeEl) sizeEl.textContent = `${downloadedMB} / ${totalMB} MB`;
+		});
+		
+		// Listen for dependency download completion
+		ipcRenderer.on('dependency-download-complete', (event, result) => {
+			if (result.success) {
+				statusText.textContent = 'Setup complete! Starting application...';
+				statusText.style.color = '#16a34a';
+				loadingDot.style.display = 'block';
+				loadingDot.style.background = '#16a34a';
+				statusChip.textContent = 'Ready';
+			} else {
+				statusText.textContent = 'Setup failed. Please check your connection.';
+				statusText.style.color = '#dc2626';
+				statusChip.textContent = 'Error';
+				statusChip.classList.add('offline');
+			}
+		});
+		
+		// Listen for any status updates from main process
+		ipcRenderer.on('splash-status', (event, message) => {
+			statusText.textContent = message;
+		});
+
+		ipcRenderer.on('deps-path', (_event, binPath) => {
+			const el = document.getElementById('deps-path');
+			if (el && binPath) {
+				el.textContent = `Dependencies: ${binPath}`;
+			}
+		});
+	</script>
+</body>
+</html>
+
+
+
